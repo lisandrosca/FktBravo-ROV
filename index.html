@@ -1,13 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <title>ROV Mission Control - Falkor (too)</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <style>
-      /* Evitar gestos del navegador como 'pull-to-refresh' */
-      body { margin: 0; overflow: hidden; touch-action: none; }
-
+      * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+      body { margin: 0; overflow: hidden; background-color: #000; }
 
       #ui-container {
         position: fixed;
@@ -18,12 +17,10 @@
         z-index: 999;
       }
 
-
-      /* HUD de Profundidad - Movido un poco a la izquierda para los botones */
       #hud-depth {
         position: absolute;
         top: 20px;
-        right: 140px; 
+        right: 130px; 
         background: rgba(0, 20, 0, 0.7);
         padding: 8px 15px;
         border: 1px solid #00ff00;
@@ -31,21 +28,18 @@
         font-size: 18px;
       }
 
-
-      /* Forzar botones de VR y AR a la esquina superior derecha */
       .a-enter-vr, .a-enter-ar {
         top: 20px !important;
         bottom: auto !important;
         background-color: rgba(0, 50, 0, 0.5) !important;
         border: 1px solid #00ff00 !important;
         border-radius: 5px !important;
+        pointer-events: auto !important;
       }
       .a-enter-vr { right: 20px !important; }
-      .a-enter-ar { right: 75px !important; } /* El de AR al lado del de VR */
-      .a-enter-vr-button, .a-enter-ar-button { background-size: 70% !important; }
+      .a-enter-ar { right: 75px !important; }
 
-
-      /* Contenedor de controles inferiores */
+      /* Contenedor de controles actualizado para 3 grupos */
       #controls-wrapper {
         position: absolute;
         bottom: 40px;
@@ -54,19 +48,17 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        padding: 0 40px;
+        padding: 0 30px;
         pointer-events: auto;
       }
 
-
-      .control-group { display: flex; flex-direction: column; align-items: center; }
+      .control-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
       .row { display: flex; gap: 10px; }
-
 
       .btn {
         width: 60px;
         height: 60px;
-        background: rgba(0, 50, 0, 0.3);
+        background: rgba(0, 50, 0, 0.4);
         border: 1px solid #00ff00;
         border-radius: 50%;
         display: flex;
@@ -74,27 +66,20 @@
         align-items: center;
         color: #00ff00;
         font-size: 24px;
-        touch-action: none;
         cursor: pointer;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
       }
       .btn:active { background: rgba(0, 255, 0, 0.5); }
-      
-      .v-gap { height: 10px; }
+      .label-ui { font-size: 10px; color: #00ff00; margin-bottom: 2px; opacity: 0.6; }
     </style>
   </head>
   <body>
 
-
     <div id="ui-container">
       <div id="hud-depth">D: <span id="depth-value">615.0</span>m</div>
-
 
       <div id="controls-wrapper">
         <div class="control-group">
           <div class="btn" id="up">▲</div>
-          <div class="v-gap"></div>
           <div class="row">
             <div class="btn" id="left">◀</div>
             <div class="btn" id="down">▼</div>
@@ -102,109 +87,92 @@
           </div>
         </div>
 
+        <div class="control-group">
+          <div class="label-ui">ZOOM</div>
+          <div class="btn" id="zoomIn">+</div>
+          <div class="btn" id="zoomOut">-</div>
+        </div>
 
         <div class="control-group">
+          <div class="label-ui">VERT</div>
           <div class="btn" id="ascend">▲</div>
-          <div class="v-gap"></div>
           <div class="btn" id="descend">▼</div>
         </div>
       </div>
     </div>
 
-
     <a-scene 
-      vr-mode-ui="enabled: true" 
+      vr-mode-ui="enabled: true"
       renderer="antialias: true"
       device-orientation-permission-ui="enabled: false"
-      fog="type: exponential; color: #00050a; density: 0.1"
-
+      fog="type: exponential; color: #00050a; density: 0.1">
+      
       <a-assets>
-        <a-asset-item id="map-model" src="Map.glb" crossorigin="anonymous"></a-asset-item>
+        <a-asset-item id="trench" src="trench.glb" crossorigin="anonymous"></a-asset-item>
       </a-assets>
 
-
       <a-grid position="0 0 0" cellColor="#00ff00" sectionColor="#005500" opacity="0.1"></a-grid>
-      <a-entity id="escenario" gltf-model="#map-model" position="0 5 -10" scale="10 10 10"></a-entity>
-
+      
+      <a-entity gltf-model="#trench" position="0 -5 -10" scale="1 1 1"></a-entity>
 
       <a-entity id="rig" position="0 1.6 0">
         <a-entity id="myCamera" 
-          camera 
-          look-controls="magicWindowTrackingEnabled: false; touchEnabled: true; pointerLockEnabled: false" 
+          camera="fov: 60" 
+          look-controls="magicWindowTrackingEnabled: false; touchEnabled: true; mouseEnabled: true" 
           wasd-controls="enabled: false">
+          <a-light type="spot" intensity="1.5" distance="30" angle="40" position="0 0 0"></a-light>
         </a-entity>
       </a-entity>
 
-
-      <a-light type="ambient" color="#fff" intensity="0.4"></a-light>
-      <a-light type="directional" position="1 10 1" intensity="0.6"></a-light>
+      <a-light type="ambient" color="#fff" intensity="0.3"></a-light>
       <a-sky color="#00050a"></a-sky>
     </a-scene>
 
-
     <script>
       const cameraRig = document.getElementById('rig');
+      const myCamera = document.getElementById('myCamera');
       const depthDisplay = document.getElementById('depth-value');
       const initialDepth = 615.0;
-      
       let activeMove = null;
-      const speed = 0.08;
-
+      const speed = 0.1;
+      const zoomSpeed = 1.0;
 
       function move() {
         if (!activeMove) return;
         
-        const rotation = document.getElementById('myCamera').getAttribute('rotation');
+        const rotation = myCamera.getAttribute('rotation');
         const angle = rotation.y * Math.PI / 180;
         const pos = cameraRig.getAttribute('position');
+        let fov = myCamera.getAttribute('camera').fov;
         
         switch(activeMove) {
-          case 'up':
-            pos.x -= Math.sin(angle) * speed;
-            pos.z -= Math.cos(angle) * speed;
-            break;
-          case 'down':
-            pos.x += Math.sin(angle) * speed;
-            pos.z += Math.cos(angle) * speed;
-            break;
-          case 'left':
-            pos.x -= Math.cos(angle) * speed;
-            pos.z += Math.sin(angle) * speed;
-            break;
-          case 'right':
-            pos.x += Math.cos(angle) * speed;
-            pos.z -= Math.sin(angle) * speed;
-            break;
-          case 'ascend':
-            pos.y += speed;
-            break;
-          case 'descend':
-            pos.y -= speed;
-            break;
+          case 'up': pos.x -= Math.sin(angle) * speed; pos.z -= Math.cos(angle) * speed; break;
+          case 'down': pos.x += Math.sin(angle) * speed; pos.z += Math.cos(angle) * speed; break;
+          case 'left': pos.x -= Math.cos(angle) * speed; pos.z += Math.sin(angle) * speed; break;
+          case 'right': pos.x += Math.cos(angle) * speed; pos.z -= Math.sin(angle) * speed; break;
+          case 'ascend': pos.y += speed; break;
+          case 'descend': pos.y -= speed; break;
+          // Lógica de Zoom
+          case 'zoomIn': fov = Math.max(10, fov - zoomSpeed); break;
+          case 'zoomOut': fov = Math.min(100, fov + zoomSpeed); break;
         }
 
-
         cameraRig.setAttribute('position', pos);
+        myCamera.setAttribute('camera', 'fov', fov);
         depthDisplay.innerText = (initialDepth - pos.y).toFixed(1);
         
         requestAnimationFrame(move);
       }
 
-
-      ['up', 'down', 'left', 'right', 'ascend', 'descend'].forEach(id => {
+      ['up', 'down', 'left', 'right', 'ascend', 'descend', 'zoomIn', 'zoomOut'].forEach(id => {
         const btn = document.getElementById(id);
-        const start = (e) => { e.preventDefault(); activeMove = id; move(); };
+        const start = (e) => { e.preventDefault(); e.stopPropagation(); activeMove = id; move(); };
         const stop = () => { activeMove = null; };
-        
         btn.addEventListener('touchstart', start);
         btn.addEventListener('touchend', stop);
         btn.addEventListener('mousedown', start);
         btn.addEventListener('mouseup', stop);
-        btn.addEventListener('mouseleave', stop);
       });
     </script>
   </body>
-
 </html>
-
-
