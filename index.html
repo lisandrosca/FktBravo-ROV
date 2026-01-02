@@ -116,15 +116,15 @@
       vr-mode-ui="enabled: true" 
       renderer="antialias: true"
       device-orientation-permission-ui="enabled: false"
-      fog="type: exponential; color: #00050a; density: 0.1">
-      
+      fog="type: exponential; color: #00050a; density: 0.1"
+
       <a-assets>
-        <a-asset-item id="landscape" src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Binary/Duck.glb" crossorigin="anonymous"></a-asset-item>
+        <a-asset-item id="map-model" src="Map.glb" crossorigin="anonymous"></a-asset-item>
       </a-assets>
 
 
       <a-grid position="0 0 0" cellColor="#00ff00" sectionColor="#005500" opacity="0.1"></a-grid>
-      <a-entity gltf-model="#landscape" position="0 0 -10" scale="5 5 5"></a-entity>
+      <a-entity id="escenario" gltf-model="#map-model" position="0 5 -10" scale="1 1 1"></a-entity>
 
 
       <a-entity id="rig" position="0 1.6 0">
@@ -206,3 +206,4 @@
   </body>
 
 </html>
+
