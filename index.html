@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>ROV Mission Control - Falkor (too)</title>
+    <title>ROV Mission Control - Map Viewer</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <style>
       * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -39,7 +39,6 @@
       .a-enter-vr { right: 20px !important; }
       .a-enter-ar { right: 75px !important; }
 
-      /* Contenedor de controles actualizado para 3 grupos */
       #controls-wrapper {
         position: absolute;
         bottom: 40px;
@@ -102,77 +101,15 @@
     </div>
 
     <a-scene 
+      renderer="antialias: true; colorManagement: true"
       vr-mode-ui="enabled: true"
-      renderer="antialias: true"
-      device-orientation-permission-ui="enabled: false"
-      fog="type: exponential; color: #00050a; density: 0.1">
+      device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <a-asset-item id="trench" src="trench.glb" crossorigin="anonymous"></a-asset-item>
+        <a-asset-item id="main-map" src="Map.glb" crossorigin="anonymous"></a-asset-item>
       </a-assets>
 
       <a-grid position="0 0 0" cellColor="#00ff00" sectionColor="#005500" opacity="0.1"></a-grid>
       
-      <a-entity gltf-model="#trench" position="0 -5 -10" scale="1 1 1"></a-entity>
 
-      <a-entity id="rig" position="0 1.6 0">
-        <a-entity id="myCamera" 
-          camera="fov: 60" 
-          look-controls="magicWindowTrackingEnabled: false; touchEnabled: true; mouseEnabled: true" 
-          wasd-controls="enabled: false">
-          <a-light type="spot" intensity="1.5" distance="30" angle="40" position="0 0 0"></a-light>
-        </a-entity>
-      </a-entity>
-
-      <a-light type="ambient" color="#fff" intensity="0.3"></a-light>
-      <a-sky color="#00050a"></a-sky>
-    </a-scene>
-
-    <script>
-      const cameraRig = document.getElementById('rig');
-      const myCamera = document.getElementById('myCamera');
-      const depthDisplay = document.getElementById('depth-value');
-      const initialDepth = 615.0;
-      let activeMove = null;
-      const speed = 0.1;
-      const zoomSpeed = 1.0;
-
-      function move() {
-        if (!activeMove) return;
-        
-        const rotation = myCamera.getAttribute('rotation');
-        const angle = rotation.y * Math.PI / 180;
-        const pos = cameraRig.getAttribute('position');
-        let fov = myCamera.getAttribute('camera').fov;
-        
-        switch(activeMove) {
-          case 'up': pos.x -= Math.sin(angle) * speed; pos.z -= Math.cos(angle) * speed; break;
-          case 'down': pos.x += Math.sin(angle) * speed; pos.z += Math.cos(angle) * speed; break;
-          case 'left': pos.x -= Math.cos(angle) * speed; pos.z += Math.sin(angle) * speed; break;
-          case 'right': pos.x += Math.cos(angle) * speed; pos.z -= Math.sin(angle) * speed; break;
-          case 'ascend': pos.y += speed; break;
-          case 'descend': pos.y -= speed; break;
-          // Lógica de Zoom
-          case 'zoomIn': fov = Math.max(10, fov - zoomSpeed); break;
-          case 'zoomOut': fov = Math.min(100, fov + zoomSpeed); break;
-        }
-
-        cameraRig.setAttribute('position', pos);
-        myCamera.setAttribute('camera', 'fov', fov);
-        depthDisplay.innerText = (initialDepth - pos.y).toFixed(1);
-        
-        requestAnimationFrame(move);
-      }
-
-      ['up', 'down', 'left', 'right', 'ascend', 'descend', 'zoomIn', 'zoomOut'].forEach(id => {
-        const btn = document.getElementById(id);
-        const start = (e) => { e.preventDefault(); e.stopPropagation(); activeMove = id; move(); };
-        const stop = () => { activeMove = null; };
-        btn.addEventListener('touchstart', start);
-        btn.addEventListener('touchend', stop);
-        btn.addEventListener('mousedown', start);
-        btn.addEventListener('mouseup', stop);
-      });
-    </script>
-  </body>
-</html>
+      
