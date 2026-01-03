@@ -1,78 +1,221 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="es">
+<head>
     <meta charset="utf-8">
-    <title>ROV Mission Control - Diagnostic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ROV Mission Control - Master v16</title>
+    
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    
     <style>
-      * { touch-action: none; user-select: none; }
-      body { margin: 0; background: #000; overflow: hidden; }
-      #ui { position: fixed; inset: 0; pointer-events: none; font-family: monospace; color: #0f0; z-index: 999; }
-      #debug { position: absolute; top: 70px; left: 20px; background: rgba(0,20,0,0.9); padding: 10px; border: 1px solid #0f0; font-size: 10px; width: 260px; pointer-events: auto; }
-      #hud-depth { position: absolute; top: 20px; right: 130px; background: rgba(0,20,0,0.7); padding: 8px 15px; border: 1px solid #0f0; font-size: 18px; }
-      #ctrls { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 30px; pointer-events: auto; }
-      .btn { width: 60px; height: 60px; background: rgba(0,50,0,0.4); border: 1px solid #0f0; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #0f0; font-size: 24px; }
+        * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courier New', monospace; }
+
+        #ui-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 100;
+            color: #00ff00;
+        }
+
+        /* Contenedor Superior Organizado */
+        .hud-top {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        /* Log Flotante con Transición */
+        #debug-console {
+            background: rgba(0, 20, 0, 0.8);
+            padding: 8px 12px;
+            border: 1px solid #00ff00;
+            font-size: 10px;
+            max-width: 180px;
+            transition: opacity 1.5s ease-in-out;
+            opacity: 1;
+        }
+
+        /* Profundidad centrada y más pequeña */
+        #depth-gauge {
+            background: rgba(0, 20, 0, 0.8);
+            padding: 6px 12px;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            font-size: 16px; /* Fuente ajustada */
+            font-weight: bold;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Forzar Botones VR/AR arriba a la derecha */
+        .a-enter-vr, .a-enter-ar {
+            top: 20px !important;
+            bottom: auto !important;
+            background-color: rgba(0, 50, 0, 0.5) !important;
+            border: 1px solid #00ff00 !important;
+            border-radius: 4px !important;
+            pointer-events: auto !important;
+        }
+        .a-enter-vr { right: 20px !important; }
+        .a-enter-ar { right: 75px !important; }
+
+        /* Controles Inferiores */
+        #controls-container {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 30px;
+            pointer-events: auto;
+        }
+
+        .control-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .row { display: flex; gap: 8px; }
+
+        .btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 40, 0, 0.5);
+            border: 1px solid #00ff00;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #00ff00;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .btn:active { background: rgba(0, 255, 0, 0.4); }
+        .label { font-size: 8px; opacity: 0.7; margin-bottom: 2px; text-transform: uppercase; }
     </style>
-  </head>
-  <body>
-    <div id="ui">
-      <div id="hud-depth">D: <span id="depth">615.0</span>m</div>
-      <div id="debug">ESTADO: Iniciando scanner de archivo...</div>
-      
-      <div id="ctrls">
-        <div style="display:flex; flex-direction:column; gap:8px; align-items:center;">
-          <div class="btn" id="up">▲</div>
-          <div style="display:flex; gap:8px;"><div class="btn" id="left">◀</div><div class="btn" id="down">▼</div><div class="btn" id="right">▶</div></div>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div id="debug-console">SYS: Iniciando...</div>
+            
+            <div id="depth-gauge">D: <span id="depth-val">615.0</span>m</div>
         </div>
-        <div style="display:flex; flex-direction:column; gap:8px;"><div class="btn" id="asc">▲</div><div class="btn" id="desc">▼</div></div>
-      </div>
+
+        <div id="controls-container">
+            <div class="control-group">
+                <div class="btn" id="move-up">▲</div>
+                <div class="row">
+                    <div class="btn" id="move-left">◀</div>
+                    <div class="btn" id="move-down">▼</div>
+                    <div class="btn" id="move-right">▶</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <span class="label">Zoom</span>
+                <div class="btn" id="zoom-in">+</div>
+                <div class="btn" id="zoom-out">-</div>
+            </div>
+
+            <div class="control-group">
+                <span class="label">Vert</span>
+                <div class="btn" id="ascend">▲</div>
+                <div class="btn" id="descend">▼</div>
+            </div>
+        </div>
     </div>
 
-    <a-scene>
-      <a-assets>
-        <a-asset-item id="map-asset" 
-          src="https://www.dropbox.com/scl/fi/0rnz0wffft9cdotoa5ud1/DamagedHelmet.glb?rlkey=iuedwerh1w2pfwbs3oltz56el&st=ptoweuof&raw=1"
-          crossorigin="anonymous">
-        </a-asset-item>
-      </a-assets>
+    <a-scene renderer="antialias: true; colorManagement: true;" device-orientation-permission-ui="enabled: false">
+        <a-assets>
+            <a-asset-item id="map-model" src="map.glb" crossorigin="anonymous"></a-asset-item>
+        </a-assets>
 
-      <a-grid opacity="0.1"></a-grid>
-      <a-entity id="target" gltf-model="#map-asset" position="0 -2 -5" scale="0.1 0.1 0.1"></a-entity>
-      <a-entity id="rig" position="0 1.6 0">
-        <a-entity id="cam" camera="fov: 60" look-controls="magicWindowTrackingEnabled: false; touchEnabled: true"></a-entity>
-      </a-entity>
-      <a-light type="hemisphere" intensity="0.8"></a-light>
+        <a-sky color="#00050a"></a-sky>
+        <a-grid position="0 0 0" cellColor="#00ff00" opacity="0.1"></a-grid>
+
+        <a-entity id="map-entity" gltf-model="#map-model" position="0 -2 -5" scale="1 1 1"></a-entity>
+
+        <a-entity id="camera-rig" position="0 1.6 0">
+            <a-entity id="main-camera" camera="fov: 60" look-controls="touchEnabled: true">
+                <a-light type="spot" intensity="2" distance="40" angle="45"></a-light>
+                <a-light type="point" intensity="0.5" distance="10" position="0 0 -1"></a-light>
+            </a-entity>
+        </a-entity>
+
+        <a-light type="hemisphere" color="#fff" groundColor="#000" intensity="0.6"></a-light>
     </a-scene>
 
     <script>
-      const debug = document.getElementById('debug');
-      const target = document.getElementById('target');
-      const url = "https://www.dropbox.com/scl/fi/b2erb9qvff3sulltohfm0/map.glb?rlkey=jzqg8fmfezby8f38yg9gjrgyb&dl=1";
+        const rig = document.getElementById('camera-rig');
+        const cam = document.getElementById('main-camera');
+        const debug = document.getElementById('debug-console');
+        const depthText = document.getElementById('depth-val');
+        const mapEntity = document.getElementById('map-entity');
 
-      // Test de salud del archivo
-      fetch(url, {method: 'HEAD'}).then(response => {
-        if (response.ok) {
-          debug.innerText = "TEST: Link de Dropbox alcanzado. Descargando...";
-        } else {
-          debug.innerText = "ERROR " + response.status + ": Dropbox bloqueó el acceso. Verifica que el archivo sea público.";
-          debug.style.color = "#f44";
+        let activeAction = null;
+        const baseDepth = 615.0;
+        const moveSpeed = 0.12;
+
+        // Lógica de carga y desaparición del log
+        mapEntity.addEventListener('model-loaded', () => {
+            debug.innerText = "SYS: map.glb OK";
+            debug.style.color = "#00ff00";
+            
+            // Desvanecer después de 4 segundos
+            setTimeout(() => {
+                debug.style.opacity = "0";
+            }, 4000);
+        });
+
+        mapEntity.addEventListener('model-error', () => {
+            debug.innerText = "ERR: map.glb falló";
+            debug.style.color = "#ff4444";
+            debug.style.opacity = "1"; // Asegurar que sea visible si hay error
+        });
+
+        function updateLoop() {
+            if (!activeAction) return;
+
+            const pos = rig.getAttribute('position');
+            const rot = cam.getAttribute('rotation');
+            const angle = rot.y * (Math.PI / 180);
+            let fov = cam.getAttribute('camera').fov;
+
+            if (activeAction === 'move-up') { pos.x -= Math.sin(angle) * moveSpeed; pos.z -= Math.cos(angle) * moveSpeed; }
+            if (activeAction === 'move-down') { pos.x += Math.sin(angle) * moveSpeed; pos.z += Math.cos(angle) * moveSpeed; }
+            if (activeAction === 'move-left') { pos.x -= Math.cos(angle) * moveSpeed; pos.z += Math.sin(angle) * moveSpeed; }
+            if (activeAction === 'move-right') { pos.x += Math.cos(angle) * moveSpeed; pos.z -= Math.sin(angle) * moveSpeed; }
+            if (activeAction === 'ascend') pos.y += moveSpeed;
+            if (activeAction === 'descend') pos.y -= moveSpeed;
+            if (activeAction === 'zoom-in') fov = Math.max(10, fov - 1);
+            if (activeAction === 'zoom-out') fov = Math.min(100, fov + 1);
+
+            rig.setAttribute('position', pos);
+            cam.setAttribute('camera', 'fov', fov);
+            depthText.innerText = (baseDepth - pos.y).toFixed(1);
+
+            requestAnimationFrame(updateLoop);
         }
-      }).catch(err => {
-        debug.innerText = "ERROR DE RED: No se pudo contactar a Dropbox. Puede ser un bloqueo de CORS.";
-        debug.style.color = "#f44";
-      });
 
-      target.addEventListener('model-loaded', () => {
-        debug.innerText = "SISTEMA: map.glb cargado correctamente.";
-        debug.style.color = "#0f0";
-      });
+        const actions = ['move-up', 'move-down', 'move-left', 'move-right', 'ascend', 'descend', 'zoom-in', 'zoom-out'];
+        actions.forEach(id => {
+            const btn = document.getElementById(id);
+            const start = (e) => { e.preventDefault(); activeAction = id; updateLoop(); };
+            const stop = () => { activeAction = null; };
+            btn.addEventListener('mousedown', start);
+            btn.addEventListener('touchstart', start);
+            window.addEventListener('mouseup', stop);
+            window.addEventListener('touchend', stop);
+        });
 
-      target.addEventListener('model-error', () => {
-        debug.innerText = "ERROR: A-Frame no pudo procesar el archivo. Revisa si es un .glb válido.";
-        debug.style.color = "#f44";
-      });
+        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
     </script>
-  </body>
+</body>
 </html>
-
-
