@@ -2,112 +2,74 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>ROV Mission Control - map.glb</title>
+    <title>ROV Mission Control - Diagnostic</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <style>
-      * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
-      body { margin: 0; overflow: hidden; background-color: #000; }
-      #ui-container { position: fixed; inset: 0; pointer-events: none; font-family: monospace; color: #00ff00; z-index: 999; }
-      #debug-console { position: absolute; top: 70px; left: 20px; background: rgba(0, 20, 0, 0.8); padding: 8px; border: 1px solid #00ff00; font-size: 11px; }
-      #hud-depth { position: absolute; top: 20px; right: 130px; background: rgba(0, 20, 0, 0.7); padding: 8px 15px; border: 1px solid #00ff00; border-radius: 5px; font-size: 18px; }
-      .a-enter-vr, .a-enter-ar { top: 20px !important; bottom: auto !important; background-color: rgba(0, 50, 0, 0.5) !important; border: 1px solid #00ff00 !important; pointer-events: auto !important; }
-      .a-enter-vr { right: 20px !important; } .a-enter-ar { right: 75px !important; }
-      #controls-wrapper { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 30px; pointer-events: auto; }
-      .control-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-      .row { display: flex; gap: 8px; }
-      .btn { width: 60px; height: 60px; background: rgba(0, 50, 0, 0.4); border: 1px solid #00ff00; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #00ff00; font-size: 24px; cursor: pointer; }
-      .btn:active { background: rgba(0, 255, 0, 0.5); }
+      * { touch-action: none; user-select: none; }
+      body { margin: 0; background: #000; overflow: hidden; }
+      #ui { position: fixed; inset: 0; pointer-events: none; font-family: monospace; color: #0f0; z-index: 999; }
+      #debug { position: absolute; top: 70px; left: 20px; background: rgba(0,20,0,0.9); padding: 10px; border: 1px solid #0f0; font-size: 10px; width: 260px; pointer-events: auto; }
+      #hud-depth { position: absolute; top: 20px; right: 130px; background: rgba(0,20,0,0.7); padding: 8px 15px; border: 1px solid #0f0; font-size: 18px; }
+      #ctrls { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 30px; pointer-events: auto; }
+      .btn { width: 60px; height: 60px; background: rgba(0,50,0,0.4); border: 1px solid #0f0; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #0f0; font-size: 24px; }
     </style>
   </head>
   <body>
-    <div id="ui-container">
-      <div id="hud-depth">D: <span id="depth-value">615.0</span>m</div>
-      <div id="debug-console">SISTEMA: Descargando map.glb...</div>
-      <div id="controls-wrapper">
-        <div class="control-group">
+    <div id="ui">
+      <div id="hud-depth">D: <span id="depth">615.0</span>m</div>
+      <div id="debug">ESTADO: Iniciando scanner de archivo...</div>
+      
+      <div id="ctrls">
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:center;">
           <div class="btn" id="up">▲</div>
-          <div class="row"><div class="btn" id="left">◀</div><div class="btn" id="down">▼</div><div class="btn" id="right">▶</div></div>
+          <div style="display:flex; gap:8px;"><div class="btn" id="left">◀</div><div class="btn" id="down">▼</div><div class="btn" id="right">▶</div></div>
         </div>
-        <div class="control-group">
-          <div class="btn" id="zoomIn">+</div>
-          <div class="btn" id="zoomOut">-</div>
-        </div>
-        <div class="control-group">
-          <div class="btn" id="ascend">▲</div>
-          <div class="btn" id="descend">▼</div>
-        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;"><div class="btn" id="asc">▲</div><div class="btn" id="desc">▼</div></div>
       </div>
     </div>
 
-    <a-scene renderer="antialias: true; colorManagement: true" device-orientation-permission-ui="enabled: false">
+    <a-scene>
       <a-assets>
         <a-asset-item id="map-asset" 
-          src="https://www.dropbox.com/scl/fi/b2erb9qvff3sulltohfm0/map.glb?rlkey=jzqg8fmfezby8f38yg9gjrgyb&st=igxbd6es&raw=1" 
+          src="https://www.dropbox.com/scl/fi/b2erb9qvff3sulltohfm0/map.glb?rlkey=jzqg8fmfezby8f38yg9gjrgyb&dl=1" 
           crossorigin="anonymous">
         </a-asset-item>
       </a-assets>
 
-      <a-grid position="0 0 0" opacity="0.1"></a-grid>
-      
-      <a-entity id="target-model" gltf-model="#map-asset" position="0 -2 -5" scale="0.1 0.1 0.1"></a-entity>
-
+      <a-grid opacity="0.1"></a-grid>
+      <a-entity id="target" gltf-model="#map-asset" position="0 -2 -5" scale="0.1 0.1 0.1"></a-entity>
       <a-entity id="rig" position="0 1.6 0">
-        <a-entity id="myCamera" camera="fov: 60" look-controls="magicWindowTrackingEnabled: false; touchEnabled: true">
-          <a-light type="spot" intensity="2" distance="40" angle="45" position="0 0 0"></a-light>
-        </a-entity>
+        <a-entity id="cam" camera="fov: 60" look-controls="magicWindowTrackingEnabled: false; touchEnabled: true"></a-entity>
       </a-entity>
-
       <a-light type="hemisphere" intensity="0.8"></a-light>
-      <a-sky color="#050505"></a-sky>
     </a-scene>
 
     <script>
-      const debug = document.getElementById('debug-console');
-      const model = document.getElementById('target-model');
-      const rig = document.getElementById('rig');
-      const cam = document.getElementById('myCamera');
-      const depth = document.getElementById('depth-value');
-      let active = null;
-      const speed = 0.1;
+      const debug = document.getElementById('debug');
+      const target = document.getElementById('target');
+      const url = "https://www.dropbox.com/scl/fi/b2erb9qvff3sulltohfm0/map.glb?rlkey=jzqg8fmfezby8f38yg9gjrgyb&dl=1";
 
-      model.addEventListener('model-loaded', () => { 
-        debug.innerText = "SISTEMA: map.glb cargado OK"; 
-        debug.style.color = "#00ff00"; 
+      // Test de salud del archivo
+      fetch(url, {method: 'HEAD'}).then(response => {
+        if (response.ok) {
+          debug.innerText = "TEST: Link de Dropbox alcanzado. Descargando...";
+        } else {
+          debug.innerText = "ERROR " + response.status + ": Dropbox bloqueó el acceso. Verifica que el archivo sea público.";
+          debug.style.color = "#f44";
+        }
+      }).catch(err => {
+        debug.innerText = "ERROR DE RED: No se pudo contactar a Dropbox. Puede ser un bloqueo de CORS.";
+        debug.style.color = "#f44";
       });
 
-      model.addEventListener('model-error', () => { 
-        debug.innerText = "ERROR: No se pudo leer map.glb"; 
-        debug.style.color = "#ff0000"; 
+      target.addEventListener('model-loaded', () => {
+        debug.innerText = "SISTEMA: map.glb cargado correctamente.";
+        debug.style.color = "#0f0";
       });
 
-      function move() {
-        if (!active) return;
-        const rot = cam.getAttribute('rotation');
-        const ang = rot.y * Math.PI / 180;
-        const pos = rig.getAttribute('position');
-        let fov = cam.getAttribute('camera').fov;
-        
-        if (active === 'up') { pos.x -= Math.sin(ang) * speed; pos.z -= Math.cos(ang) * speed; }
-        if (active === 'down') { pos.x += Math.sin(ang) * speed; pos.z += Math.cos(ang) * speed; }
-        if (active === 'left') { pos.x -= Math.cos(ang) * speed; pos.z += Math.sin(ang) * speed; }
-        if (active === 'right') { pos.x += Math.cos(ang) * speed; pos.z -= Math.sin(ang) * speed; }
-        if (active === 'ascend') pos.y += speed;
-        if (active === 'descend') pos.y -= speed;
-        if (active === 'zoomIn') fov = Math.max(10, fov - 1);
-        if (active === 'zoomOut') fov = Math.min(100, fov + 1);
-
-        rig.setAttribute('position', pos);
-        cam.setAttribute('camera', 'fov', fov);
-        depth.innerText = (615.0 - pos.y).toFixed(1);
-        requestAnimationFrame(move);
-      }
-
-      ['up', 'down', 'left', 'right', 'ascend', 'descend', 'zoomIn', 'zoomOut'].forEach(id => {
-        const btn = document.getElementById(id);
-        const start = (e) => { e.preventDefault(); active = id; move(); };
-        const stop = () => { active = null; };
-        btn.addEventListener('touchstart', start); btn.addEventListener('touchend', stop);
-        btn.addEventListener('mousedown', start); btn.addEventListener('mouseup', stop);
+      target.addEventListener('model-error', () => {
+        debug.innerText = "ERROR: A-Frame no pudo procesar el archivo. Revisa si es un .glb válido.";
+        debug.style.color = "#f44";
       });
     </script>
   </body>
