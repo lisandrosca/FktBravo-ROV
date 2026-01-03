@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ROV Mission Control - Master v19</title>
+    <title>ROV Mission Control - Auto-Calibration v20</title>
     
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     
@@ -11,7 +11,6 @@
         * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courier New', monospace; }
 
-        /* Capa HUD General */
         #ui-layer {
             position: fixed;
             inset: 0;
@@ -20,7 +19,6 @@
             color: #00ff00;
         }
 
-        /* Log Flotante (Izquierda) */
         #debug-console {
             position: absolute;
             top: 20px;
@@ -29,12 +27,12 @@
             padding: 8px 12px;
             border: 1px solid #00ff00;
             font-size: 10px;
-            max-width: 160px;
+            max-width: 200px;
             transition: opacity 1.5s ease-in-out;
             pointer-events: none;
+            white-space: pre-wrap;
         }
 
-        /* Profundidad (Centro) */
         #depth-gauge {
             position: absolute;
             top: 20px;
@@ -46,14 +44,8 @@
             border-radius: 4px;
             font-size: 14px;
             font-weight: bold;
-            white-space: nowrap;
         }
 
-        /* NO HAY REGLAS PARA .a-enter-vr NI .a-enter-ar.
-           A-Frame los pondrá en su lugar por defecto (abajo a la derecha).
-        */
-
-        /* Controles Inferiores */
         #controls-container {
             position: absolute;
             bottom: 40px;
@@ -89,7 +81,7 @@
 <body>
 
     <div id="ui-layer">
-        <div id="debug-console">SYS: Iniciando...</div>
+        <div id="debug-console">SYS: Analizando modelo...</div>
         <div id="depth-gauge">D: <span id="depth-val">615.0</span>m</div>
 
         <div id="controls-container">
@@ -116,19 +108,15 @@
         </div>
     </div>
 
-    <a-scene 
-        renderer="antialias: true; colorManagement: true;" 
-        vr-mode-ui="enabled: true" 
-        device-orientation-permission-ui="enabled: false">
-        
+    <a-scene renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <a-asset-item id="map-model" src="map.glb" crossorigin="anonymous"></a-asset-item>
+            <a-asset-item id="map-model" src="trench.glb" crossorigin="anonymous"></a-asset-item>
         </a-assets>
 
         <a-sky color="#00050a"></a-sky>
         <a-grid position="0 0 0" cellColor="#00ff00" opacity="0.1"></a-grid>
 
-        <a-entity id="map-entity" gltf-model="#map-model" position="0 -2 -5" scale="1 1 1"></a-entity>
+        <a-entity id="map-entity" gltf-model="#map-model"></a-entity>
 
         <a-entity id="camera-rig" position="0 1.6 0">
             <a-entity id="main-camera" camera="fov: 60" look-controls="touchEnabled: true">
@@ -151,14 +139,41 @@
         const baseDepth = 615.0;
         const moveSpeed = 0.12;
 
+        // LÓGICA DE AUTO-CALIBRACIÓN
         mapEntity.addEventListener('model-loaded', () => {
-            debug.innerText = "SYS: map.glb OK";
+            // 1. Obtener la malla 3D
+            const obj = mapEntity.getObject3D('mesh');
+            if (!obj) return;
+
+            // 2. Calcular Bounding Box (Dimensiones reales)
+            const bbox = new THREE.Box3().setFromObject(obj);
+            const size = new THREE.Vector3();
+            bbox.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z);
+
+            // 3. Normalizar Escala (Objetivo: 20 unidades)
+            const scaleFactor = 20 / maxDim;
+            mapEntity.setAttribute('scale', `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
+
+            // 4. Centrar Modelo
+            const center = new THREE.Vector3();
+            bbox.getCenter(center);
+            
+            // Posicionar el centro del modelo a 10m frente al ROV y 2m abajo
+            mapEntity.setAttribute('position', {
+                x: -center.x * scaleFactor,
+                y: (-center.y * scaleFactor) - 2,
+                z: (-center.z * scaleFactor) - 10
+            });
+
+            // 5. Feedback y Cierre de Log
+            debug.innerText = `SYS: OK\nDim: ${maxDim.toFixed(2)}m\nEscala: ${scaleFactor.toFixed(4)}`;
             debug.style.color = "#00ff00";
-            setTimeout(() => { debug.style.opacity = "0"; }, 4000);
+            setTimeout(() => { debug.style.opacity = "0"; }, 5000);
         });
 
         mapEntity.addEventListener('model-error', () => {
-            debug.innerText = "ERR: map.glb Falló";
+            debug.innerText = "ERR: Falló carga de modelo";
             debug.style.color = "#ff4444";
             debug.style.opacity = "1";
         });
@@ -176,8 +191,8 @@
             if (activeAction === 'move-right') { pos.x += Math.cos(angle) * moveSpeed; pos.z -= Math.sin(angle) * moveSpeed; }
             if (activeAction === 'ascend') pos.y += moveSpeed;
             if (activeAction === 'descend') pos.y -= moveSpeed;
-            if (activeAction === 'zoom-in') fov = Math.max(10, fov - 1);
-            if (activeAction === 'zoom-out') fov = Math.min(100, fov + 1);
+            if (activeAction === 'zoom-in') fov = Math.max(10, fov - 1.2);
+            if (activeAction === 'zoom-out') fov = Math.min(1000, fov + 1.2);
 
             rig.setAttribute('position', pos);
             cam.setAttribute('camera', 'fov', fov);
