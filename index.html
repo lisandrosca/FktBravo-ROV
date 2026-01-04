@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ROV Mission Control - Stabilized v21</title>
+    <title>ROV Mission Control - Light Control v27</title>
     
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     
@@ -11,80 +11,82 @@
         * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courier New', monospace; }
 
-        #ui-layer {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 100;
-            color: #00ff00;
+        #ui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; color: #00ff00; }
+        
+        /* Botones Superiores Izquierda */
+        .top-left-ctrls {
+            position: absolute; top: 20px; left: 20px;
+            display: flex; gap: 10px; pointer-events: auto;
+        }
+
+        .icon-btn {
+            width: 40px; height: 40px;
+            background: rgba(0, 40, 0, 0.6);
+            border: 1px solid #00ff00; border-radius: 4px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18px; cursor: pointer; transition: opacity 0.5s;
+            z-index: 101;
         }
 
         #debug-console {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 20, 0, 0.8);
-            padding: 8px 12px;
-            border: 1px solid #00ff00;
-            font-size: 10px;
-            max-width: 200px;
-            transition: opacity 1.5s ease-in-out;
-            pointer-events: none;
-            white-space: pre-wrap;
+            position: absolute; top: 75px; left: 20px;
+            background: rgba(0, 20, 0, 0.8); padding: 8px 12px;
+            border: 1px solid #00ff00; font-size: 10px;
+            max-width: 200px; transition: opacity 0.5s;
+            pointer-events: none; white-space: pre-wrap;
         }
 
-        #depth-gauge {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 20, 0, 0.8);
-            padding: 5px 12px;
-            border: 1px solid #00ff00;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: bold;
+        .hud-top-center {
+            position: absolute; top: 20px; left: 50%;
+            transform: translateX(-50%); display: flex; gap: 10px;
+            transition: opacity 0.5s;
+        }
+
+        .hud-box {
+            background: rgba(0, 20, 0, 0.8); padding: 5px 12px;
+            border: 1px solid #00ff00; border-radius: 4px;
+            font-size: 13px; font-weight: bold;
         }
 
         #controls-container {
-            position: absolute;
-            bottom: 40px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding: 0 30px;
-            pointer-events: auto;
+            position: absolute; bottom: 40px; left: 0; right: 0;
+            display: flex; justify-content: space-between;
+            align-items: flex-end; padding: 0 20px; 
+            pointer-events: auto; transition: opacity 0.5s;
         }
 
         .control-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .row { display: flex; gap: 8px; }
 
         .btn {
-            width: 60px;
-            height: 60px;
-            background: rgba(0, 40, 0, 0.5);
-            border: 1px solid #00ff00;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #00ff00;
-            font-size: 24px;
-            cursor: pointer;
+            width: 55px; height: 55px;
+            background: rgba(0, 40, 0, 0.5); border: 1px solid #00ff00;
+            border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; color: #00ff00; font-size: 22px; cursor: pointer;
         }
         .btn:active { background: rgba(0, 255, 0, 0.4); }
         .label { font-size: 8px; opacity: 0.7; margin-bottom: 2px; text-transform: uppercase; }
+
+        .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
+        .ghost { opacity: 0.2 !important; }
     </style>
 </head>
 <body>
 
     <div id="ui-layer">
-        <div id="debug-console">SYS: Calibrando sensores...</div>
-        <div id="depth-gauge">D: <span id="depth-val">615.0</span>m</div>
+        <div class="top-left-ctrls">
+            <div id="hud-toggle" class="icon-btn" title="Alternar HUD">👁️</div>
+            <div id="light-toggle" class="icon-btn hidable" title="Luz ROV">🔦</div>
+        </div>
 
-        <div id="controls-container">
+        <div id="debug-console" class="hidable">SYS: Sistemas de iluminación listos...</div>
+        
+        <div class="hud-top-center hidable">
+            <div class="hud-box">D: <span id="depth-val">615.0</span>m</div>
+            <div class="hud-box">THR: <span id="speed-mul">1.0</span>x</div>
+        </div>
+
+        <div id="controls-container" class="hidable">
             <div class="control-group">
                 <div class="btn" id="move-up">▲</div>
                 <div class="row">
@@ -93,127 +95,109 @@
                     <div class="btn" id="move-right">▶</div>
                 </div>
             </div>
-
-            <div class="control-group">
-                <span class="label">Zoom</span>
-                <div class="btn" id="zoom-in">+</div>
-                <div class="btn" id="zoom-out">-</div>
-            </div>
-
-            <div class="control-group">
-                <span class="label">Vert</span>
-                <div class="btn" id="ascend">▲</div>
-                <div class="btn" id="descend">▼</div>
-            </div>
+            <div class="control-group"><span class="label">Marcha</span><div class="btn" id="speed-plus">+</div><div class="btn" id="speed-minus">-</div></div>
+            <div class="control-group"><span class="label">Zoom</span><div class="btn" id="zoom-in">+</div><div class="btn" id="zoom-out">-</div></div>
+            <div class="control-group"><span class="label">Vert</span><div class="btn" id="ascend">▲</div><div class="btn" id="descend">▼</div></div>
         </div>
     </div>
 
-    <a-scene 
-        renderer="antialias: true; colorManagement: true;" 
-        vr-mode-ui="enabled: true" 
-        device-orientation-permission-ui="enabled: true">
-        
-        <a-assets>
-            <a-asset-item id="map-model" src="trench.glb" crossorigin="anonymous"></a-asset-item>
-        </a-assets>
-
+    <a-scene renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: true">
+        <a-assets><a-asset-item id="map-model" src="trench.glb" crossorigin="anonymous"></a-asset-item></a-assets>
         <a-sky color="#00050a"></a-sky>
         <a-grid position="0 0 0" cellColor="#00ff00" opacity="0.1"></a-grid>
-
         <a-entity id="map-entity" gltf-model="#map-model"></a-entity>
-
         <a-entity id="camera-rig" position="0 1.6 0">
-            <a-entity id="main-camera" 
-                camera="fov: 80" 
-                look-controls="magicWindowTrackingEnabled: true; touchEnabled: true;">
-                
-                <a-light type="spot" intensity="2" distance="40" angle="45"></a-light>
-                <a-light type="point" intensity="0.5" distance="10" position="0 0 -1"></a-light>
+            <a-entity id="main-camera" camera="fov: 80" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true;">
+                <a-light id="rov-spot" type="spot" intensity="2" distance="40" angle="45"></a-light>
+                <a-light id="rov-point" type="point" intensity="0.5" distance="10" position="0 0 -1"></a-light>
             </a-entity>
         </a-entity>
-
-        <a-light type="hemisphere" color="#fff" groundColor="#000" intensity="0.6"></a-light>
+        <a-light type="hemisphere" color="#fff" groundColor="#000" intensity="0.3"></a-light>
     </a-scene>
 
     <script>
-        const rig = document.getElementById('camera-rig');
-        const cam = document.getElementById('main-camera');
-        const debug = document.getElementById('debug-console');
-        const depthText = document.getElementById('depth-val');
-        const mapEntity = document.getElementById('map-entity');
+        const rig = document.getElementById('camera-rig'), cam = document.getElementById('main-camera'),
+              debug = document.getElementById('debug-console'), depthText = document.getElementById('depth-val'),
+              speedText = document.getElementById('speed-mul'), mapEntity = document.getElementById('map-entity'),
+              hudToggle = document.getElementById('hud-toggle'), lightToggle = document.getElementById('light-toggle'),
+              rovSpot = document.getElementById('rov-spot'), rovPoint = document.getElementById('rov-point'),
+              hidableElements = document.querySelectorAll('.hidable');
 
-        let activeAction = null;
-        const baseDepth = 615.0;
-        const moveSpeed = 0.12;
+        const speedLevels = [0.1, 0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0, 3.0];
+        let currentLevelIndex = 5, activeAction = null, baseMoveSpeed = 0.04, baseZoomSpeed = 0.8;
+        const initialFov = 80, baseDepth = 615.0;
+        let isHudVisible = true, lightsOn = true;
 
-        // SISTEMA DE AUTO-AJUSTE (Manteniendo v20)
+        // TOGGLE HUD
+        hudToggle.addEventListener('click', () => {
+            isHudVisible = !isHudVisible;
+            hidableElements.forEach(el => el.classList.toggle('ui-hidden', !isHudVisible));
+            hudToggle.classList.toggle('ghost', !isHudVisible);
+            hudToggle.innerText = isHudVisible ? "👁️" : "✖️";
+        });
+
+        // TOGGLE LUCES
+        lightToggle.addEventListener('click', () => {
+            lightsOn = !lightsOn;
+            rovSpot.setAttribute('intensity', lightsOn ? 2 : 0);
+            rovPoint.setAttribute('intensity', lightsOn ? 0.5 : 0);
+            lightToggle.innerText = lightsOn ? "🔦" : "🚫";
+            lightToggle.style.color = lightsOn ? "#00ff00" : "#ff4444";
+        });
+
         mapEntity.addEventListener('model-loaded', () => {
             const obj = mapEntity.getObject3D('mesh');
             if (!obj) return;
-
             const bbox = new THREE.Box3().setFromObject(obj);
             const size = new THREE.Vector3();
             bbox.getSize(size);
             const maxDim = Math.max(size.x, size.y, size.z);
-
             const scaleFactor = 20 / maxDim;
             mapEntity.setAttribute('scale', `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
-
             const center = new THREE.Vector3();
             bbox.getCenter(center);
-            
-            mapEntity.setAttribute('position', {
-                x: -center.x * scaleFactor,
-                y: (-center.y * scaleFactor) - 2,
-                z: (-center.z * scaleFactor) - 10
-            });
-
-            debug.innerText = `SISTEMA ESTABILIZADO\nDim: ${maxDim.toFixed(2)}m\nAuto-Scale: ${scaleFactor.toFixed(4)}`;
-            debug.style.color = "#00ff00";
-            setTimeout(() => { debug.style.opacity = "0"; }, 5000);
+            mapEntity.setAttribute('position', { x: -center.x * scaleFactor, y: (-center.y * scaleFactor) - 2, z: (-center.z * scaleFactor) - 10 });
+            baseMoveSpeed = 0.02 + (Math.log10(maxDim + 1) * 0.03);
+            debug.innerText = `SISTEMA OK\nLuces: ${lightsOn ? 'ON' : 'OFF'}`;
+            setTimeout(() => { if(isHudVisible) debug.style.opacity = "0"; }, 6000);
         });
 
-        mapEntity.addEventListener('model-error', () => {
-            debug.innerText = "ERR: Falló carga de modelo";
-            debug.style.color = "#ff4444";
-            debug.style.opacity = "1";
-        });
-
-        // Bucle de navegación
         function updateLoop() {
             if (!activeAction) return;
-            const pos = rig.getAttribute('position');
-            const rot = cam.getAttribute('rotation');
-            const angle = rot.y * (Math.PI / 180);
+            const pos = rig.getAttribute('position'), rot = cam.getAttribute('rotation'),
+                  angle = rot.y * (Math.PI / 180);
             let fov = cam.getAttribute('camera').fov;
+            const zoomFactor = fov / initialFov, multiplier = speedLevels[currentLevelIndex],
+                  currentMoveSpeed = baseMoveSpeed * zoomFactor * multiplier,
+                  currentVerticalSpeed = currentMoveSpeed * 0.70, currentZoomSpeed = baseZoomSpeed * (fov / 80);
 
-            if (activeAction === 'move-up') { pos.x -= Math.sin(angle) * moveSpeed; pos.z -= Math.cos(angle) * moveSpeed; }
-            if (activeAction === 'move-down') { pos.x += Math.sin(angle) * moveSpeed; pos.z += Math.cos(angle) * moveSpeed; }
-            if (activeAction === 'move-left') { pos.x -= Math.cos(angle) * moveSpeed; pos.z += Math.sin(angle) * moveSpeed; }
-            if (activeAction === 'move-right') { pos.x += Math.cos(angle) * moveSpeed; pos.z -= Math.sin(angle) * moveSpeed; }
-            if (activeAction === 'ascend') pos.y += moveSpeed;
-            if (activeAction === 'descend') pos.y -= moveSpeed;
-            if (activeAction === 'zoom-in') fov = Math.max(20, fov - 1.2);
-            if (activeAction === 'zoom-out') fov = Math.min(150, fov + 1.2);
+            if (activeAction === 'move-up') { pos.x -= Math.sin(angle) * currentMoveSpeed; pos.z -= Math.cos(angle) * currentMoveSpeed; }
+            if (activeAction === 'move-down') { pos.x += Math.sin(angle) * currentMoveSpeed; pos.z += Math.cos(angle) * currentMoveSpeed; }
+            if (activeAction === 'move-left') { pos.x -= Math.cos(angle) * currentMoveSpeed; pos.z += Math.sin(angle) * currentMoveSpeed; }
+            if (activeAction === 'move-right') { pos.x += Math.cos(angle) * currentMoveSpeed; pos.z -= Math.sin(angle) * currentMoveSpeed; }
+            if (activeAction === 'ascend') pos.y += currentVerticalSpeed;
+            if (activeAction === 'descend') pos.y -= currentVerticalSpeed;
+            if (activeAction === 'zoom-in') fov = Math.max(5, fov - currentZoomSpeed);
+            if (activeAction === 'zoom-out') fov = Math.min(150, fov + currentZoomSpeed);
 
-            rig.setAttribute('position', pos);
-            cam.setAttribute('camera', 'fov', fov);
+            rig.setAttribute('position', pos); cam.setAttribute('camera', 'fov', fov);
             depthText.innerText = (baseDepth - pos.y).toFixed(1);
             requestAnimationFrame(updateLoop);
         }
 
-        const actions = ['move-up', 'move-down', 'move-left', 'move-right', 'ascend', 'descend', 'zoom-in', 'zoom-out'];
-        actions.forEach(id => {
+        const setupButton = (id, start, stop) => {
             const btn = document.getElementById(id);
-            const start = (e) => { e.preventDefault(); activeAction = id; updateLoop(); };
-            const stop = () => { activeAction = null; };
             btn.addEventListener('mousedown', start);
-            btn.addEventListener('touchstart', start);
-            window.addEventListener('mouseup', stop);
-            window.addEventListener('touchend', stop);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); start(); });
+            if (stop) { window.addEventListener('mouseup', stop); window.addEventListener('touchend', stop); }
+        };
+
+        ['move-up', 'move-down', 'move-left', 'move-right', 'ascend', 'descend', 'zoom-in', 'zoom-out'].forEach(id => {
+            setupButton(id, () => { activeAction = id; updateLoop(); }, () => { activeAction = null; });
         });
 
-        // Bloqueo de gestos del sistema
+        setupButton('speed-plus', () => { if (currentLevelIndex < speedLevels.length - 1) currentLevelIndex++; speedText.innerText = speedLevels[currentLevelIndex].toFixed(1); });
+        setupButton('speed-minus', () => { if (currentLevelIndex > 0) currentLevelIndex--; speedText.innerText = speedLevels[currentLevelIndex].toFixed(1); });
         document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
     </script>
 </body>
