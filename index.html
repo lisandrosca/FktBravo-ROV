@@ -2,203 +2,217 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ROV</title>
-    
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIDA EN LOS EXTREMOS - ROV Mission Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courier New', monospace; }
+        :root {
+            --soi-blue: #00a3e0;
+            --glass-bg: rgba(0, 15, 30, 0.8);
+            --border-white: rgba(255, 255, 255, 0.2);
+            --text-main: #ffffff;
+        }
 
-        #ui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; color: #00ff00; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: radial-gradient(circle at center, #001a33 0%, #000000 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto; 
+            padding-bottom: 50px;
+        }
+
+        .bg-overlay {
+            position: fixed; inset: 0;
+            background: url('https://schmidtocean.org/wp-content/themes/soi/assets/images/header-bg.jpg') center/cover no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        header {
+            margin-top: 50px;
+            text-align: center;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            padding: 0 20px;
+        }
+
+        h1 { font-size: 1.5rem; font-weight: 300; border-bottom: 1px solid var(--border-white); padding-bottom: 10px; display: inline-block; }
+        .expedition-tag { color: var(--soi-blue); font-size: 0.8rem; margin-top: 5px; opacity: 0.8; }
+
+        .mission-grid {
+            display: flex;
+            gap: 30px;
+            margin-top: 60px;
+            padding: 0 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+        }
+
+        .mission-card {
+            width: 300px;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-white);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            /* Importante para que el touch no seleccione texto */
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+
+        /* Efecto de elevación al interactuar */
+        .mission-card:hover, .mission-card.is-touching {
+            border-color: #fff;
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 163, 224, 0.2);
+        }
+
+        /* --- NUEVO: Sistema de Doble Imagen --- */
+        .card-img-container {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            background-color: #111;
+            border-bottom: 1px solid var(--border-white);
+            overflow: hidden;
+        }
+
+        .card-img {
+            position: absolute;
+            inset: 0; /* Ocupa todo el contenedor */
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Asegura que la imagen llene el espacio sin deformarse */
+            transition: opacity 0.5s ease-in-out; /* Transición suave */
+        }
+
+        /* La imagen del ambiente (base) siempre visible */
+        .img-env { z-index: 1; }
+
+        /* El close-up (arriba) invisible por defecto */
+        .img-closeup { 
+            z-index: 2; 
+            opacity: 0;
+        }
+
+        /* Cuando el mouse pasa por encima de LA TARJETA COMPLETA, muestra el close-up */
+        .mission-card:hover .img-closeup {
+            opacity: 1;
+        }
         
-        /* Botones Superiores Izquierda */
-        .top-left-ctrls {
-            position: absolute; top: 20px; left: 20px;
-            display: flex; gap: 10px; pointer-events: auto;
+        /* Clase que añadirá JS para el touch en móviles */
+        .mission-card.is-touching .img-closeup {
+            opacity: 1;
+        }
+        /* ------------------------------------ */
+
+
+        .card-body { padding: 20px; }
+        .dive-id { font-size: 0.7rem; color: var(--soi-blue); margin-bottom: 5px; }
+        .dive-title { font-size: 1rem; font-weight: 500; height: 45px; margin-bottom: 15px; }
+        
+        .dive-stats { font-size: 0.75rem; opacity: 0.7; border-top: 1px solid var(--border-white); padding-top: 15px; }
+        .dive-stats span { display: block; margin-bottom: 4px; }
+
+        .launch-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: 1px solid #fff;
+            text-align: center;
+            font-size: 0.8rem;
+            background: transparent;
+            color: #fff;
+            transition: all 0.2s;
         }
 
-        .icon-btn {
-            width: 40px; height: 40px;
-            background: rgba(0, 40, 0, 0.6);
-            border: 1px solid #00ff00; border-radius: 4px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 18px; cursor: pointer; transition: opacity 0.5s;
-            z-index: 101;
-        }
+        .mission-card:hover .launch-btn, .mission-card.is-touching .launch-btn { background: #fff; color: #000; font-weight: bold; }
 
-        #debug-console {
-            position: absolute; top: 75px; left: 20px;
-            background: rgba(0, 20, 0, 0.8); padding: 8px 12px;
-            border: 1px solid #00ff00; font-size: 10px;
-            max-width: 200px; transition: opacity 0.5s;
-            pointer-events: none; white-space: pre-wrap;
-        }
-
-        .hud-top-center {
-            position: absolute; top: 20px; left: 50%;
-            transform: translateX(-50%); display: flex; gap: 10px;
-            transition: opacity 0.5s;
-        }
-
-        .hud-box {
-            background: rgba(0, 20, 0, 0.8); padding: 5px 12px;
-            border: 1px solid #00ff00; border-radius: 4px;
-            font-size: 13px; font-weight: bold;
-        }
-
-        #controls-container {
-            position: absolute; bottom: 40px; left: 0; right: 0;
-            display: flex; justify-content: space-between;
-            align-items: flex-end; padding: 0 20px; 
-            pointer-events: auto; transition: opacity 0.5s;
-        }
-
-        .control-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .row { display: flex; gap: 8px; }
-
-        .btn {
-            width: 55px; height: 55px;
-            background: rgba(0, 40, 0, 0.5); border: 1px solid #00ff00;
-            border-radius: 50%; display: flex; justify-content: center;
-            align-items: center; color: #00ff00; font-size: 22px; cursor: pointer;
-        }
-        .btn:active { background: rgba(0, 255, 0, 0.4); }
-        .label { font-size: 8px; opacity: 0.7; margin-bottom: 2px; text-transform: uppercase; }
-
-        .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
-        .ghost { opacity: 0.2 !important; }
+        footer { margin-top: 50px; font-size: 0.6rem; opacity: 0.4; letter-spacing: 2px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="ui-layer">
-        <div class="top-left-ctrls">
-            <div id="hud-toggle" class="icon-btn" title="Alternar HUD">👁️</div>
-            <div id="light-toggle" class="icon-btn hidable" title="Luz ROV">🔦</div>
-        </div>
+    <div class="bg-overlay"></div>
 
-        <div id="debug-console" class="hidable">SYS: Sistemas de iluminación listos...</div>
-        
-        <div class="hud-top-center hidable">
-            <div class="hud-box">D: <span id="depth-val">615.0</span>m</div>
-            <div class="hud-box">THR: <span id="speed-mul">1.0</span>x</div>
-        </div>
+    <header>
+        <h1>VIDA EN LOS EXTREMOS</h1>
+        <div class="expedition-tag">Expedición FKt251206 Bravo | R/V Falkor (too)</div>
+    </header>
 
-        <div id="controls-container" class="hidable">
-            <div class="control-group">
-                <div class="btn" id="move-up">▲</div>
-                <div class="row">
-                    <div class="btn" id="move-left">◀</div>
-                    <div class="btn" id="move-down">▼</div>
-                    <div class="btn" id="move-right">▶</div>
-                </div>
+    <div class="mission-grid">
+        <a href="/habitats/whale_fall.html" class="mission-card">
+            <div class="card-img-container">
+                <img src="/assets/images/whale_fall.jpg" alt="Whale Fall Environment" class="card-img img-env">
+                <img src="assets/images/whale_fall_close.jpg" alt="Whale Bone Close-up" class="card-img img-closeup">
             </div>
-            <div class="control-group"><span class="label">Marcha</span><div class="btn" id="speed-plus">+</div><div class="btn" id="speed-minus">-</div></div>
-            <div class="control-group"><span class="label">Zoom</span><div class="btn" id="zoom-in">+</div><div class="btn" id="zoom-out">-</div></div>
-            <div class="control-group"><span class="label">Vert</span><div class="btn" id="ascend">▲</div><div class="btn" id="descend">▼</div></div>
-        </div>
+            <div class="card-body">
+                <div class="dive-id">DIVE S0883</div>
+                <div class="dive-title">The Whale Fall</div>
+                <div class="dive-stats">
+                    <span>PROFUNDIDAD: 3895 M</span>
+                    
+                </div>
+                <div class="launch-btn">LAUNCH DIVE</div>
+            </div>
+        </a>
+
+        <a href="/habitats/clam_bed.html" class="mission-card">
+            <div class="card-img-container">
+                <img src="assets/images/clam_bed.jpg" alt="Clam Bed Environment" class="card-img img-env">
+                <img src="assets/images/clam_bed_close.jpg" alt="Clam Close-up" class="card-img img-closeup">
+            </div>
+            <div class="card-body">
+                <div class="dive-id">DIVE S0889</div>
+                <div class="dive-title">Clam Beds<br>(Vesicomyidae sp.)</div>
+                <div class="dive-stats">
+                    <span>PROFUNDIDAD: 690 M</span>
+                   
+                </div>
+                <div class="launch-btn">LAUNCH DIVE</div>
+            </div>
+        </a>
+
+        <a href="/habitats/giant_corals.html" class="mission-card">
+            <div class="card-img-container">
+                 <img src="assets/images/giant_corals.jpg" class="card-img img-env">
+                <img src="assets/images/giant_corals_close.jpg" alt="Paragorgia Close-up" class="card-img img-closeup">
+            </div>
+            <div class="card-body">
+                <div class="dive-id">DIVE S0892</div>
+                <div class="dive-title">Giant Corals<br>(Paragorgia sp.)</div>
+                <div class="dive-stats">
+                    <span>PROFUNDIDAD: 420 M</span>
+                    
+                </div>
+                <div class="launch-btn">LAUNCH DIVE</div>
+            </div>
+        </a>
     </div>
 
-    <a-scene renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: true">
-        <a-assets><a-asset-item id="map-model" src="wf.glb" crossorigin="anonymous"></a-asset-item></a-assets>
-        <a-sky color="#00050a"></a-sky>
-        <a-grid position="0 0 0" cellColor="#00ff00" opacity="0.1"></a-grid>
-        <a-entity id="map-entity" gltf-model="#map-model"></a-entity>
-        <a-entity id="camera-rig" position="0 1.6 0">
-            <a-entity id="main-camera" camera="fov: 80" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true;">
-                <a-light id="rov-spot" type="spot" intensity="2" distance="40" angle="45"></a-light>
-                <a-light id="rov-point" type="point" intensity="0.5" distance="10" position="0 0 -1"></a-light>
-            </a-entity>
-        </a-entity>
-        <a-light type="hemisphere" color="#fff" groundColor="#000" intensity="0.3"></a-light>
-    </a-scene>
+    <footer>EST. 2026 | Lisandro Scarrone </footer>
 
     <script>
-        const rig = document.getElementById('camera-rig'), cam = document.getElementById('main-camera'),
-              debug = document.getElementById('debug-console'), depthText = document.getElementById('depth-val'),
-              speedText = document.getElementById('speed-mul'), mapEntity = document.getElementById('map-entity'),
-              hudToggle = document.getElementById('hud-toggle'), lightToggle = document.getElementById('light-toggle'),
-              rovSpot = document.getElementById('rov-spot'), rovPoint = document.getElementById('rov-point'),
-              hidableElements = document.querySelectorAll('.hidable');
-
-        const speedLevels = [0.1, 0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0, 3.0];
-        let currentLevelIndex = 5, activeAction = null, baseMoveSpeed = 0.04, baseZoomSpeed = 0.8;
-        const initialFov = 80, baseDepth = 615.0;
-        let isHudVisible = true, lightsOn = true;
-
-        // TOGGLE HUD
-        hudToggle.addEventListener('click', () => {
-            isHudVisible = !isHudVisible;
-            hidableElements.forEach(el => el.classList.toggle('ui-hidden', !isHudVisible));
-            hudToggle.classList.toggle('ghost', !isHudVisible);
-            hudToggle.innerText = isHudVisible ? "👁️" : "✖️";
+        // Script para manejar la interacción táctil en móviles
+        // Esto asegura que al mantener presionado el dedo, se active el efecto hover
+        document.querySelectorAll('.mission-card').forEach(card => {
+            card.addEventListener('touchstart',  function() { this.classList.add('is-touching'); }, {passive: true});
+            card.addEventListener('touchend',    function() { this.classList.remove('is-touching'); }, {passive: true});
+            card.addEventListener('touchcancel', function() { this.classList.remove('is-touching'); }, {passive: true});
         });
-
-        // TOGGLE LUCES
-        lightToggle.addEventListener('click', () => {
-            lightsOn = !lightsOn;
-            rovSpot.setAttribute('intensity', lightsOn ? 2 : 0);
-            rovPoint.setAttribute('intensity', lightsOn ? 0.5 : 0);
-            lightToggle.innerText = lightsOn ? "🔦" : "🚫";
-            lightToggle.style.color = lightsOn ? "#00ff00" : "#ff4444";
-        });
-
-        mapEntity.addEventListener('model-loaded', () => {
-            const obj = mapEntity.getObject3D('mesh');
-            if (!obj) return;
-            const bbox = new THREE.Box3().setFromObject(obj);
-            const size = new THREE.Vector3();
-            bbox.getSize(size);
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const scaleFactor = 20 / maxDim;
-            mapEntity.setAttribute('scale', `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
-            const center = new THREE.Vector3();
-            bbox.getCenter(center);
-            mapEntity.setAttribute('position', { x: -center.x * scaleFactor, y: (-center.y * scaleFactor) - 2, z: (-center.z * scaleFactor) - 10 });
-            baseMoveSpeed = 0.02 + (Math.log10(maxDim + 1) * 0.03);
-            debug.innerText = `SISTEMA OK\nLuces: ${lightsOn ? 'ON' : 'OFF'}`;
-            setTimeout(() => { if(isHudVisible) debug.style.opacity = "0"; }, 6000);
-        });
-
-        function updateLoop() {
-            if (!activeAction) return;
-            const pos = rig.getAttribute('position'), rot = cam.getAttribute('rotation'),
-                  angle = rot.y * (Math.PI / 180);
-            let fov = cam.getAttribute('camera').fov;
-            const zoomFactor = fov / initialFov, multiplier = speedLevels[currentLevelIndex],
-                  currentMoveSpeed = baseMoveSpeed * zoomFactor * multiplier,
-                  currentVerticalSpeed = currentMoveSpeed * 0.70, currentZoomSpeed = baseZoomSpeed * (fov / 80);
-
-            if (activeAction === 'move-up') { pos.x -= Math.sin(angle) * currentMoveSpeed; pos.z -= Math.cos(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-down') { pos.x += Math.sin(angle) * currentMoveSpeed; pos.z += Math.cos(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-left') { pos.x -= Math.cos(angle) * currentMoveSpeed; pos.z += Math.sin(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-right') { pos.x += Math.cos(angle) * currentMoveSpeed; pos.z -= Math.sin(angle) * currentMoveSpeed; }
-            if (activeAction === 'ascend') pos.y += currentVerticalSpeed;
-            if (activeAction === 'descend') pos.y -= currentVerticalSpeed;
-            if (activeAction === 'zoom-in') fov = Math.max(5, fov - currentZoomSpeed);
-            if (activeAction === 'zoom-out') fov = Math.min(150, fov + currentZoomSpeed);
-
-            rig.setAttribute('position', pos); cam.setAttribute('camera', 'fov', fov);
-            depthText.innerText = (baseDepth - pos.y).toFixed(1);
-            requestAnimationFrame(updateLoop);
-        }
-
-        const setupButton = (id, start, stop) => {
-            const btn = document.getElementById(id);
-            btn.addEventListener('mousedown', start);
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); start(); });
-            if (stop) { window.addEventListener('mouseup', stop); window.addEventListener('touchend', stop); }
-        };
-
-        ['move-up', 'move-down', 'move-left', 'move-right', 'ascend', 'descend', 'zoom-in', 'zoom-out'].forEach(id => {
-            setupButton(id, () => { activeAction = id; updateLoop(); }, () => { activeAction = null; });
-        });
-
-        setupButton('speed-plus', () => { if (currentLevelIndex < speedLevels.length - 1) currentLevelIndex++; speedText.innerText = speedLevels[currentLevelIndex].toFixed(1); });
-        setupButton('speed-minus', () => { if (currentLevelIndex > 0) currentLevelIndex--; speedText.innerText = speedLevels[currentLevelIndex].toFixed(1); });
-        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
     </script>
+
 </body>
 </html>
