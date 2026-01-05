@@ -5,77 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ROV Mission Control - V1.0</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <style>
-        * { touch-action: none; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courier New', monospace; }
-        #ui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; color: #fff; }
-
-        /* Telemetría SOI */
-        #telemetry-block {
-            position: absolute; bottom: 40px; left: 40px;
-            font-size: 14px; line-height: 1.4;
-            text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
-            text-transform: uppercase;
-            transition: all 0.5s ease;
-        }
-        .data-row { display: flex; gap: 10px; width: 220px; }
-        .data-label { width: 100px; }
-        .data-val { font-weight: bold; }
-
-        #date-block {
-            position: absolute; bottom: 30px; left: 50%;
-            transform: translateX(-50%);
-            font-size: 16px; font-weight: bold;
-            text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
-        }
-
-        .top-left-ctrls {
-            position: absolute; top: 30px; left: 30px;
-            display: flex; gap: 15px; pointer-events: auto;
-            transition: all 0.5s ease;
-        }
-        .icon-btn {
-            width: 45px; height: 45px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1.5px solid #fff; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; color: #fff;
-        }
-        .icon-btn svg, .btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-        #debug-console { 
-            position: absolute; top: 90px; left: 30px; 
-            font-size: 10px; color: #fff;
-            max-width: 280px; transition: all 0.5s ease;
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        /* CONTROLES */
-        #controls-container {
-            position: absolute; bottom: 200px; right: 30px;
-            display: flex; flex-direction: column; gap: 20px;
-            pointer-events: auto;
-            transition: all 0.5s ease;
-        }
-        .control-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .row { display: flex; gap: 10px; }
-        .btn {
-            width: 55px; height: 55px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1.5px solid #fff; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            color: #fff; cursor: pointer;
-        }
-        .label { font-size: 9px; opacity: 0.9; margin-bottom: 2px; text-transform: uppercase; color: #fff; font-weight: bold;}
-        
-        @media (orientation: landscape) {
-            #controls-container { bottom: 70px; left: 40px; right: 40px; flex-direction: row; justify-content: space-between; align-items: flex-end; }
-            #telemetry-block { bottom: 220px; }
-            .top-left-ctrls { left: 280px; }
-        }
-
-        .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
-    </style>
+    <link rel="stylesheet" href="../css/rov-styles.css">
 </head>
 <body>
 
@@ -92,10 +22,10 @@
         <div id="date-block" class="hidable">2025-12-21</div>
 
         <div class="top-left-ctrls">
-            <div id="hud-toggle" class="icon-btn">
+            <div id="hud-toggle" class="icon-btn hidable">
                 <svg><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </div>
-            <div id="fullscreen-toggle" class="icon-btn">
+            <div id="fullscreen-toggle" class="icon-btn hidable">
                 <svg><path d="M15 3h6v6M9 21H3v-6M21 15v6h-6M3 9V3h6"></path></svg>
             </div>
             <div id="light-toggle" class="icon-btn hidable">
@@ -104,9 +34,9 @@
             <div id="reset-pos" class="icon-btn hidable">
                 <svg><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             </div>
-            <div id="back-to-menu" class="icon-btn" onclick="window.location.href='/./index.html'" title="Volver al Menú">
-    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-</div>
+            <div id="back-to-menu" class="icon-btn hidable" onclick="window.location.href='/./index.html'" title="Volver al Menú">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </div>
         </div>
 
         <div id="debug-console" class="hidable">SYSTEM: Starting dive...</div>
@@ -151,127 +81,10 @@
         <a-light type="hemisphere" intensity="0.4"></a-light>
     </a-scene>
 
-    <script>
-        const debug = document.getElementById('debug-console'),
-              mapEntity = document.getElementById('map-entity'),
-              rig = document.getElementById('camera-rig'),
-              cam = document.getElementById('main-camera'),
-              depthText = document.getElementById('depth-val'),
-              headText = document.getElementById('head-val'),
-              hudToggle = document.getElementById('hud-toggle'),
-              fsToggle = document.getElementById('fullscreen-toggle'),
-              lightToggle = document.getElementById('light-toggle'),
-              resetBtn = document.getElementById('reset-pos'),
-              rovSpot = document.getElementById('rov-spot'),
-              rovPoint = document.getElementById('rov-point'),
-              hidableElements = document.querySelectorAll('.hidable');
-
-        let activeAction = null, currentLevelIndex = 5, lightsOn = true, isHudVisible = true;
-        const speedLevels = [0.1, 0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0, 3.0];
-        let baseMoveSpeed = 0.04, baseZoomSpeed = 0.8, initialFov = 80;
-        const baseDepth = 3895.0;
-
-        mapEntity.addEventListener('model-loaded', () => {
-            const mesh = mapEntity.getObject3D('mesh');
-            if (!mesh) return;
-            const loader = new THREE.TextureLoader();
-            mesh.traverse(node => {
-                if (node.isMesh) {
-                    const materials = Array.isArray(node.material) ? node.material : [node.material];
-                    materials.forEach(mat => {
-                        mat.side = THREE.DoubleSide;
-                        const match = node.name.match(/material(\d+)/i);
-                        if (match) {
-                            mat.map = loader.load(`/assets/models/whale-fall/textures/material${match[1]}_diffuse.jpeg`, (tex) => {
-                                tex.encoding = THREE.sRGBEncoding;
-                                tex.flipY = false;
-                            });
-                            mat.needsUpdate = true;
-                        }
-                    });
-                }
-            });
-            const bbox = new THREE.Box3().setFromObject(mesh);
-            const size = new THREE.Vector3();
-            bbox.getSize(size);
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const scaleFactor = 20 / maxDim;
-            mapEntity.setAttribute('scale', `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
-            const center = new THREE.Vector3();
-            bbox.getCenter(center);
-            mapEntity.setAttribute('position', { x: -center.x * scaleFactor, y: (-center.y * scaleFactor) - 2, z: (-center.z * scaleFactor) - 10 });
-            baseMoveSpeed = 0.02 + (Math.log10(maxDim + 1) * 0.03);
-            setTimeout(() => { debug.style.opacity = "0"; }, 5000);
-        });
-
-        fsToggle.addEventListener('click', () => {
-            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } 
-            else { document.exitFullscreen(); }
-        });
-
-        function updateLoop() {
-            const rot = cam.getAttribute('rotation');
-            headText.innerText = Math.floor((360 - (rot.y % 360)) % 360).toString().padStart(3, '0');
-            if (!activeAction) return;
-            const pos = rig.getAttribute('position'), angle = rot.y * (Math.PI / 180);
-            let fov = cam.getAttribute('camera').fov;
-            const currentMoveSpeed = baseMoveSpeed * (fov/80) * speedLevels[currentLevelIndex];
-            if (activeAction === 'move-up') { pos.x -= Math.sin(angle) * currentMoveSpeed; pos.z -= Math.cos(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-down') { pos.x += Math.sin(angle) * currentMoveSpeed; pos.z += Math.cos(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-left') { pos.x -= Math.cos(angle) * currentMoveSpeed; pos.z += Math.sin(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-right') { pos.x += Math.cos(angle) * currentMoveSpeed; pos.z -= Math.sin(angle) * currentMoveSpeed; }
-            if (activeAction === 'ascend') pos.y += currentMoveSpeed * 0.7;
-            if (activeAction === 'descend') pos.y -= currentMoveSpeed * 0.7;
-            if (activeAction === 'zoom-in') fov = Math.max(5, fov - (baseZoomSpeed * (fov/80)));
-            if (activeAction === 'zoom-out') fov = Math.min(150, fov + (baseZoomSpeed * (fov/80)));
-            rig.setAttribute('position', pos); cam.setAttribute('camera', 'fov', fov);
-            depthText.innerText = Math.floor(baseDepth - pos.y);
-            requestAnimationFrame(updateLoop);
-        }
-
-        const setupBtn = (id, start, stop) => {
-            const b = document.getElementById(id); if(!b) return;
-            b.addEventListener('touchstart', (e) => { e.preventDefault(); start(); });
-            window.addEventListener('touchend', stop);
-        };
-        ['move-up', 'move-down', 'move-left', 'move-right', 'ascend', 'descend', 'zoom-in', 'zoom-out'].forEach(id => {
-            setupBtn(id, () => { activeAction = id; updateLoop(); }, () => { activeAction = null; });
-        });
-        document.getElementById('speed-plus').onclick = () => { if (currentLevelIndex < speedLevels.length-1) currentLevelIndex++; };
-        document.getElementById('speed-minus').onclick = () => { if (currentLevelIndex > 0) currentLevelIndex--; };
-        resetBtn.onclick = () => { rig.setAttribute('position', "0 1.6 0"); cam.setAttribute('rotation', "0 0 0"); };
-        lightToggle.addEventListener('click', () => {
-            lightsOn = !lightsOn;
-            rovSpot.setAttribute('light', 'intensity', lightsOn ? 2.5 : 0);
-            rovPoint.setAttribute('light', 'intensity', lightsOn ? 0.8 : 0);
-            lightToggle.style.color = lightsOn ? "#fff" : "#ff4444";
-        });
-        hudToggle.addEventListener('click', () => {
-            isHudVisible = !isHudVisible;
-            hidableElements.forEach(el => el.classList.toggle('ui-hidden', !isHudVisible));
-        });
-        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
-        setInterval(() => { if(!activeAction) updateLoop(); }, 100);
-    </script>
-
+    <script src="../js/rov-config.js"></script>
+    <script src="../js/rov-controls.js"></script>
+    <script src="../js/rov-main.js"></script>
 
 </body>
 <footer>EST. 2026 | Lisandro Scarrone | 3D models by Ben Erwin</footer>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </html>

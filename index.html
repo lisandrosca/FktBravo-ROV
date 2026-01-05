@@ -3,145 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIDA EN LOS EXTREMOS - ROV Mission Control</title>
+    <title>VIDA EN LOS EXTREMOS - Mission Control</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --soi-blue: #00a3e0;
-            --glass-bg: rgba(0, 15, 30, 0.8);
-            --border-white: rgba(255, 255, 255, 0.2);
-            --text-main: #ffffff;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'JetBrains Mono', monospace;
-            background: radial-gradient(circle at center, #001a33 0%, #000000 100%);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto; 
-            padding-bottom: 50px;
-        }
-
-        .bg-overlay {
-            position: fixed; inset: 0;
-            background: url('https://schmidtocean.org/wp-content/themes/soi/assets/images/header-bg.jpg') center/cover no-repeat;
-            opacity: 0.15;
-            z-index: -1;
-        }
-
-        header {
-            margin-top: 50px;
-            text-align: center;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            padding: 0 20px;
-        }
-
-        h1 { font-size: 1.5rem; font-weight: 300; border-bottom: 1px solid var(--border-white); padding-bottom: 10px; display: inline-block; }
-        .expedition-tag { color: var(--soi-blue); font-size: 0.8rem; margin-top: 5px; opacity: 0.8; }
-
-        .mission-grid {
-            display: flex;
-            gap: 30px;
-            margin-top: 60px;
-            padding: 0 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 1200px;
-        }
-
-        .mission-card {
-            width: 300px;
-            background: var(--glass-bg);
-            border: 1px solid var(--border-white);
-            border-radius: 4px;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-decoration: none;
-            color: inherit;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            /* Importante para que el touch no seleccione texto */
-            user-select: none; 
-            -webkit-user-select: none;
-        }
-
-        /* Efecto de elevación al interactuar */
-        .mission-card:hover, .mission-card.is-touching {
-            border-color: #fff;
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(0, 163, 224, 0.2);
-        }
-
-        /* --- NUEVO: Sistema de Doble Imagen --- */
-        .card-img-container {
-            position: relative;
-            width: 100%;
-            height: 180px;
-            background-color: #111;
-            border-bottom: 1px solid var(--border-white);
-            overflow: hidden;
-        }
-
-        .card-img {
-            position: absolute;
-            inset: 0; /* Ocupa todo el contenedor */
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Asegura que la imagen llene el espacio sin deformarse */
-            transition: opacity 0.5s ease-in-out; /* Transición suave */
-        }
-
-        /* La imagen del ambiente (base) siempre visible */
-        .img-env { z-index: 1; }
-
-        /* El close-up (arriba) invisible por defecto */
-        .img-closeup { 
-            z-index: 2; 
-            opacity: 0;
-        }
-
-        /* Cuando el mouse pasa por encima de LA TARJETA COMPLETA, muestra el close-up */
-        .mission-card:hover .img-closeup {
-            opacity: 1;
-        }
-        
-        /* Clase que añadirá JS para el touch en móviles */
-        .mission-card.is-touching .img-closeup {
-            opacity: 1;
-        }
-        /* ------------------------------------ */
-
-
-        .card-body { padding: 20px; }
-        .dive-id { font-size: 0.7rem; color: var(--soi-blue); margin-bottom: 5px; }
-        .dive-title { font-size: 1rem; font-weight: 500; height: 45px; margin-bottom: 15px; }
-        
-        .dive-stats { font-size: 0.75rem; opacity: 0.7; border-top: 1px solid var(--border-white); padding-top: 15px; }
-        .dive-stats span { display: block; margin-bottom: 4px; }
-
-        .launch-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            border: 1px solid #fff;
-            text-align: center;
-            font-size: 0.8rem;
-            background: transparent;
-            color: #fff;
-            transition: all 0.2s;
-        }
-
-        .mission-card:hover .launch-btn, .mission-card.is-touching .launch-btn { background: #fff; color: #000; font-weight: bold; }
-
-        footer { margin-top: 50px; font-size: 0.6rem; opacity: 0.4; letter-spacing: 2px; text-align: center; }
-    </style>
+    <link rel="stylesheet" href="css/menu-styles.css">
 </head>
 <body>
 
@@ -153,60 +17,49 @@
     </header>
 
     <div class="mission-grid">
-        <a href="/habitats/whale_fall.html" class="mission-card">
+        <a href="habitats/whale_fall.html" class="mission-card">
             <div class="card-img-container">
-                <img src="/assets/images/whale_fall.jpg" alt="Whale Fall Environment" class="card-img img-env">
-                <img src="assets/images/whale_fall_close.jpg" alt="Whale Bone Close-up" class="card-img img-closeup">
+                <img src="assets/images/whale_fall.jpg" alt="Ambiente" class="card-img img-env">
+                <img src="assets/images/whale_fall_close.jpg" alt="Detalle" class="card-img img-closeup">
             </div>
             <div class="card-body">
                 <div class="dive-id">DIVE S0883</div>
                 <div class="dive-title">The Whale Fall</div>
-                <div class="dive-stats">
-                    <span>PROFUNDIDAD: 3895 M</span>
-                    
-                </div>
+                <div class="dive-stats"><span>PROFUNDIDAD: 3895 M</span></div>
                 <div class="launch-btn">LAUNCH DIVE</div>
             </div>
         </a>
 
-        <a href="/habitats/clam_bed.html" class="mission-card">
+        <a href="habitats/clam_bed.html" class="mission-card">
             <div class="card-img-container">
-                <img src="assets/images/clam_bed.jpg" alt="Clam Bed Environment" class="card-img img-env">
-                <img src="assets/images/clam_bed_close.jpg" alt="Clam Close-up" class="card-img img-closeup">
+                <img src="assets/images/clam_bed.jpg" alt="Ambiente" class="card-img img-env">
+                <img src="assets/images/clam_bed_close.jpg" alt="Detalle" class="card-img img-closeup">
             </div>
             <div class="card-body">
                 <div class="dive-id">DIVE S0889</div>
                 <div class="dive-title">Clam Beds<br>(Vesicomyidae sp.)</div>
-                <div class="dive-stats">
-                    <span>PROFUNDIDAD: 690 M</span>
-                   
-                </div>
+                <div class="dive-stats"><span>PROFUNDIDAD: 690 M</span></div>
                 <div class="launch-btn">LAUNCH DIVE</div>
             </div>
         </a>
 
-        <a href="/habitats/giant_corals.html" class="mission-card">
+        <a href="habitats/giant_corals.html" class="mission-card">
             <div class="card-img-container">
-                 <img src="assets/images/giant_corals.jpg" class="card-img img-env">
-                <img src="assets/images/giant_corals_close.jpg" alt="Paragorgia Close-up" class="card-img img-closeup">
+                 <img src="assets/images/giant_corals.jpg" alt="Ambiente" class="card-img img-env">
+                <img src="assets/images/giant_corals_close.jpg" alt="Detalle" class="card-img img-closeup">
             </div>
             <div class="card-body">
                 <div class="dive-id">DIVE S0892</div>
                 <div class="dive-title">Giant Corals<br>(Paragorgia sp.)</div>
-                <div class="dive-stats">
-                    <span>PROFUNDIDAD: 420 M</span>
-                    
-                </div>
+                <div class="dive-stats"><span>PROFUNDIDAD: 420 M</span></div>
                 <div class="launch-btn">LAUNCH DIVE</div>
             </div>
         </a>
     </div>
 
-    <footer>EST. 2026 | Lisandro Scarrone </footer>
+    <footer>EST. 2026 | Lisandro Scarrone</footer>
 
     <script>
-        // Script para manejar la interacción táctil en móviles
-        // Esto asegura que al mantener presionado el dedo, se active el efecto hover
         document.querySelectorAll('.mission-card').forEach(card => {
             card.addEventListener('touchstart',  function() { this.classList.add('is-touching'); }, {passive: true});
             card.addEventListener('touchend',    function() { this.classList.remove('is-touching'); }, {passive: true});

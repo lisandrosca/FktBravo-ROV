@@ -91,11 +91,11 @@
 
         <div id="date-block" class="hidable">2025-12-21</div>
 
-        <div class="top-left-ctrls">
-            <div id="hud-toggle" class="icon-btn">
+                <div class="top-left-ctrls">
+            <div id="hud-toggle" class="icon-btn hidable">
                 <svg><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </div>
-            <div id="fullscreen-toggle" class="icon-btn">
+            <div id="fullscreen-toggle" class="icon-btn hidable">
                 <svg><path d="M15 3h6v6M9 21H3v-6M21 15v6h-6M3 9V3h6"></path></svg>
             </div>
             <div id="light-toggle" class="icon-btn hidable">
@@ -104,9 +104,9 @@
             <div id="reset-pos" class="icon-btn hidable">
                 <svg><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             </div>
-            <div id="back-to-menu" class="icon-btn" onclick="window.location.href='index.html'" title="Volver al Menú">
-    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-</div>
+            <div id="back-to-menu" class="icon-btn hidable" onclick="window.location.href='/./index.html'" title="Volver al Menú">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </div>
         </div>
 
         <div id="debug-console" class="hidable">SYSTEM: Starting dive...</div>
@@ -152,7 +152,7 @@
     </a-scene>
 
     <script>
-        const debug = document.getElementById('debug-console'),
+                const debug = document.getElementById('debug-console'),
               mapEntity = document.getElementById('map-entity'),
               rig = document.getElementById('camera-rig'),
               cam = document.getElementById('main-camera'),
@@ -168,8 +168,12 @@
 
         let activeAction = null, currentLevelIndex = 5, lightsOn = true, isHudVisible = true;
         const speedLevels = [0.1, 0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0, 3.0];
-        let baseMoveSpeed = 0.04, baseZoomSpeed = 0.8, initialFov = 80;
+        let baseMoveSpeed = 0.04, baseZoomSpeed = 0.8;
         const baseDepth = 3895.0;
+        const DEADZONE = 0.15;
+
+        // Objeto para manejar los "clics" de los botones del joystick y evitar repeticiones infinitas
+        const debounce = { light: false, hud: false, reset: false, menu: false, speed: false };
 
         mapEntity.addEventListener('model-loaded', () => {
             const mesh = mapEntity.getObject3D('mesh');
@@ -201,57 +205,143 @@
             bbox.getCenter(center);
             mapEntity.setAttribute('position', { x: -center.x * scaleFactor, y: (-center.y * scaleFactor) - 2, z: (-center.z * scaleFactor) - 10 });
             baseMoveSpeed = 0.02 + (Math.log10(maxDim + 1) * 0.03);
+            
+            debug.innerText = "SYSTEM: ROV Online - Controller V2.0 Ready";
             setTimeout(() => { debug.style.opacity = "0"; }, 5000);
         });
 
-        fsToggle.addEventListener('click', () => {
-            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } 
-            else { document.exitFullscreen(); }
-        });
+        function updateGamepad() {
+            const gamepads = navigator.getGamepads();
+            const gp = gamepads[0]; 
+            if (!gp) return;
+
+            const pos = rig.getAttribute('position');
+            const rot = cam.getAttribute('rotation');
+            let fov = cam.getAttribute('camera').fov;
+            const angle = rot.y * (Math.PI / 180);
+            const currentSpeed = baseMoveSpeed * (fov/80) * speedLevels[currentLevelIndex] * 1.5;
+
+            // --- MOVIMIENTO (Stick Izquierdo) ---
+            const lx = Math.abs(gp.axes[0]) > DEADZONE ? gp.axes[0] : 0;
+            // ly invertido: Negamos el valor para que "arriba" sea adelante
+            const ly = Math.abs(gp.axes[1]) > DEADZONE ? -gp.axes[1] : 0; 
+            
+            pos.x += (lx * Math.cos(angle) - ly * Math.sin(angle)) * currentSpeed;
+            pos.z += (lx * Math.sin(angle) + ly * Math.cos(angle)) * currentSpeed;
+
+            // --- ROTACIÓN / HEADING (Stick Derecho) ---
+            const rx = Math.abs(gp.axes[2]) > DEADZONE ? gp.axes[2] : 0;
+            if (rx !== 0) {
+                let rigRot = rig.getAttribute('rotation') || {x:0, y:0, z:0};
+                rigRot.y -= rx * 2.5; 
+                rig.setAttribute('rotation', rigRot);
+            }
+
+            // --- ASCENSO / DESCENSO (Gatillos) ---
+            if (gp.buttons[7].pressed) pos.y -= currentSpeed * 0.8; // R2: Descender
+            if (gp.buttons[6].pressed) pos.y += currentSpeed * 0.8; // L2: Ascender
+
+            // --- ZOOM (L1/R1 y D-PAD Arriba/Abajo) ---
+            if (gp.buttons[5].pressed || gp.buttons[12].pressed) { // R1 o D-Pad Up (Zoom In)
+                fov = Math.max(5, fov - 1);
+            }
+            if (gp.buttons[4].pressed || gp.buttons[13].pressed) { // L1 o D-Pad Down (Zoom Out)
+                fov = Math.min(140, fov + 1);
+            }
+
+            // --- VELOCIDAD (D-PAD Izquierda/Derecha) ---
+            if (gp.buttons[15].pressed && !debounce.speed) { // Derecha: Speed Up
+                if (currentLevelIndex < speedLevels.length - 1) currentLevelIndex++;
+                debounce.speed = true; setTimeout(() => debounce.speed = false, 200);
+            }
+            if (gp.buttons[14].pressed && !debounce.speed) { // Izquierda: Speed Down
+                if (currentLevelIndex > 0) currentLevelIndex--;
+                debounce.speed = true; setTimeout(() => debounce.speed = false, 200);
+            }
+
+            // --- BOTONES DE FIGURAS ---
+            // Triángulo (Botón 3): Linterna
+            if (gp.buttons[3].pressed && !debounce.light) {
+                lightToggle.click();
+                debounce.light = true; setTimeout(() => debounce.light = false, 400);
+            }
+            // Círculo (Botón 1): Volver al Menú
+            if (gp.buttons[1].pressed && !debounce.menu) {
+                window.location.href = '/./index.html';
+                debounce.menu = true;
+            }
+            // Cruz (Botón 0): Esconder HUD
+            if (gp.buttons[0].pressed && !debounce.hud) {
+                hudToggle.click();
+                debounce.hud = true; setTimeout(() => debounce.hud = false, 400);
+            }
+            // Cuadrado (Botón 2): Reset Position
+            if (gp.buttons[2].pressed && !debounce.reset) {
+                resetBtn.click();
+                debounce.reset = true; setTimeout(() => debounce.reset = false, 400);
+            }
+
+            rig.setAttribute('position', pos);
+            cam.setAttribute('camera', 'fov', fov);
+        }
 
         function updateLoop() {
             const rot = cam.getAttribute('rotation');
-            headText.innerText = Math.floor((360 - (rot.y % 360)) % 360).toString().padStart(3, '0');
-            if (!activeAction) return;
-            const pos = rig.getAttribute('position'), angle = rot.y * (Math.PI / 180);
-            let fov = cam.getAttribute('camera').fov;
-            const currentMoveSpeed = baseMoveSpeed * (fov/80) * speedLevels[currentLevelIndex];
-            if (activeAction === 'move-up') { pos.x -= Math.sin(angle) * currentMoveSpeed; pos.z -= Math.cos(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-down') { pos.x += Math.sin(angle) * currentMoveSpeed; pos.z += Math.cos(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-left') { pos.x -= Math.cos(angle) * currentMoveSpeed; pos.z += Math.sin(angle) * currentMoveSpeed; }
-            if (activeAction === 'move-right') { pos.x += Math.cos(angle) * currentMoveSpeed; pos.z -= Math.sin(angle) * currentMoveSpeed; }
-            if (activeAction === 'ascend') pos.y += currentMoveSpeed * 0.7;
-            if (activeAction === 'descend') pos.y -= currentMoveSpeed * 0.7;
-            if (activeAction === 'zoom-in') fov = Math.max(5, fov - (baseZoomSpeed * (fov/80)));
-            if (activeAction === 'zoom-out') fov = Math.min(150, fov + (baseZoomSpeed * (fov/80)));
-            rig.setAttribute('position', pos); cam.setAttribute('camera', 'fov', fov);
-            depthText.innerText = Math.floor(baseDepth - pos.y);
+            const rigRot = rig.getAttribute('rotation') || {y:0};
+            headText.innerText = Math.floor((360 - ((rot.y + rigRot.y) % 360)) % 360).toString().padStart(3, '0');
+
+            updateGamepad();
+
+            if (activeAction) {
+                const pos = rig.getAttribute('position'), angle = rot.y * (Math.PI / 180);
+                let fov = cam.getAttribute('camera').fov;
+                const speed = baseMoveSpeed * (fov/80) * speedLevels[currentLevelIndex];
+                if (activeAction === 'move-up') { pos.x -= Math.sin(angle) * speed; pos.z -= Math.cos(angle) * speed; }
+                if (activeAction === 'move-down') { pos.x += Math.sin(angle) * speed; pos.z += Math.cos(angle) * speed; }
+                if (activeAction === 'move-left') { pos.x -= Math.cos(angle) * speed; pos.z += Math.sin(angle) * speed; }
+                if (activeAction === 'move-right') { pos.x += Math.cos(angle) * speed; pos.z -= Math.sin(angle) * speed; }
+                if (activeAction === 'ascend') pos.y += speed * 0.7;
+                if (activeAction === 'descend') pos.y -= speed * 0.7;
+                if (activeAction === 'zoom-in') fov = Math.max(5, fov - (baseZoomSpeed * (fov/80)));
+                if (activeAction === 'zoom-out') fov = Math.min(150, fov + (baseZoomSpeed * (fov/80)));
+                rig.setAttribute('position', pos); cam.setAttribute('camera', 'fov', fov);
+            }
+            depthText.innerText = Math.floor(baseDepth - rig.getAttribute('position').y);
             requestAnimationFrame(updateLoop);
         }
 
-        const setupBtn = (id, start, stop) => {
-            const b = document.getElementById(id); if(!b) return;
-            b.addEventListener('touchstart', (e) => { e.preventDefault(); start(); });
-            window.addEventListener('touchend', stop);
-        };
-        ['move-up', 'move-down', 'move-left', 'move-right', 'ascend', 'descend', 'zoom-in', 'zoom-out'].forEach(id => {
-            setupBtn(id, () => { activeAction = id; updateLoop(); }, () => { activeAction = null; });
+        window.addEventListener("gamepadconnected", (e) => {
+            debug.innerText = `CONNECTED: ${e.gamepad.id.split('(')[0]}`;
+            debug.style.opacity = "1";
+            setTimeout(() => { debug.style.opacity = "0"; }, 3000);
         });
+
+        const setupBtn = (id) => {
+            const b = document.getElementById(id); if(!b) return;
+            b.addEventListener('touchstart', (e) => { e.preventDefault(); activeAction = id; });
+            window.addEventListener('touchend', () => { activeAction = null; });
+        };
+        ['move-up', 'move-down', 'move-left', 'move-right', 'ascend', 'descend', 'zoom-in', 'zoom-out'].forEach(setupBtn);
+
+        fsToggle.onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
         document.getElementById('speed-plus').onclick = () => { if (currentLevelIndex < speedLevels.length-1) currentLevelIndex++; };
         document.getElementById('speed-minus').onclick = () => { if (currentLevelIndex > 0) currentLevelIndex--; };
-        resetBtn.onclick = () => { rig.setAttribute('position', "0 1.6 0"); cam.setAttribute('rotation', "0 0 0"); };
+        resetBtn.onclick = () => { rig.setAttribute('position', "0 1.6 0"); rig.setAttribute('rotation', "0 0 0"); cam.setAttribute('rotation', "0 0 0"); };
+        
         lightToggle.addEventListener('click', () => {
             lightsOn = !lightsOn;
             rovSpot.setAttribute('light', 'intensity', lightsOn ? 2.5 : 0);
             rovPoint.setAttribute('light', 'intensity', lightsOn ? 0.8 : 0);
             lightToggle.style.color = lightsOn ? "#fff" : "#ff4444";
         });
+
         hudToggle.addEventListener('click', () => {
             isHudVisible = !isHudVisible;
             hidableElements.forEach(el => el.classList.toggle('ui-hidden', !isHudVisible));
         });
-        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
-        setInterval(() => { if(!activeAction) updateLoop(); }, 100);
+
+        updateLoop();
+
     </script>
 
 
