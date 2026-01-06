@@ -1,8 +1,8 @@
 VIDA EN LOS EXTREMOS: ROV Mission Control
 
-VIDA EN LOS EXTREMOS es un visualizador interactivo 3D basado en web diseñado para explorar hábitats marinos profundos. 
+Visualizador interactivo 3D basado en web diseñado para explorar hábitats marinos profundos. 
 
-Este proyecto permite navegar modelos de fotogrametría de alta resolución recolectados durante la campaña científica FKt251206 Bravo a bordo del R/V Falkor (too).
+Este proyecto permite navegar modelos de fotogrametría de alta resolución recolectados durante la campaña científica FKt251206 a bordo del R/V Falkor (too).
 
 La interfaz emula el sistema de telemetría y control de un ROV real, integrando datos de profundidad, rumbo y condiciones ambientales en una experiencia optimizada para dispositivos móviles.
 
