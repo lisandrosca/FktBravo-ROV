@@ -34,7 +34,7 @@
             <div id="reset-pos" class="icon-btn hidable">
                 <svg><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             </div>
-            <div id="back-to-menu" class="icon-btn hidable" onclick="window.location.href='/./index.html'" title="Volver al Menú">
+            <div id="back-to-menu" class="icon-btn hidable" onclick="window.location.href='../index.html'" title="Volver al Menú">
                 <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             </div>
         </div>
@@ -68,7 +68,7 @@
     </div>
 
     <a-scene renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: true">
-        <a-assets><a-asset-item id="whale-scene" src="/assets/models/whale-fall/scene.gltf"></a-asset-item></a-assets>
+        <a-assets><a-asset-item id="whale-scene" src="../assets/models/whale-fall/scene.gltf"></a-asset-item></a-assets>
         <a-sky color="#00050a"></a-sky>
         <a-grid opacity="0.1" cellColor="#fff"></a-grid>
         <a-entity id="map-entity" gltf-model="#whale-scene"></a-entity>

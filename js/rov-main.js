@@ -9,7 +9,7 @@ mapEntity.addEventListener('model-loaded', () => {
                 mat.side = THREE.DoubleSide;
                 const match = node.name.match(/material(\d+)/i);
                 if (match) {
-                    mat.map = loader.load(`/assets/models/whale-fall/textures/material${match[1]}_diffuse.jpeg`, (tex) => {
+                    mat.map = loader.load(`../assets/models/whale-fall/textures/material${match[1]}_diffuse.jpeg`, (tex) => {
                         tex.encoding = THREE.sRGBEncoding;
                         tex.flipY = false;
                     });
