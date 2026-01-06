@@ -1,3 +1,10 @@
+// Actualizar el texto de velocidad en pantalla
+function updateSpeedUI() {
+    if (speedValText) {
+        speedValText.innerText = speedLevels[currentLevelIndex].toFixed(1);
+    }
+}
+
 function updateGamepad() {
     const gamepads = navigator.getGamepads();
     const gp = gamepads[0]; 
@@ -6,68 +13,66 @@ function updateGamepad() {
     const pos = rig.getAttribute('position');
     let fov = cam.getAttribute('camera').fov;
     
-    // 1. OBTENER ROTACIÓN TOTAL (Heading)
-    // Sumamos la rotación del rig y de la cámara para que el frente siempre sea tu vista
     const rigRot = rig.getAttribute('rotation') || {x:0, y:0, z:0};
     const camRot = cam.getAttribute('rotation') || {x:0, y:0, z:0};
     const totalAngle = (rigRot.y + camRot.y) * (Math.PI / 180);
     
     const currentSpeed = baseMoveSpeed * (fov/80) * speedLevels[currentLevelIndex] * 1.5;
 
-    // --- MOVIMIENTO (Stick Izquierdo) ---
-    // Invertimos gp.axes[1] para que arriba sea positivo (adelante)
+    // --- MOVIMIENTO ---
     const lx = Math.abs(gp.axes[0]) > DEADZONE ? gp.axes[0] : 0; 
     const ly = Math.abs(gp.axes[1]) > DEADZONE ? -gp.axes[1] : 0; 
 
-    // Trigonometría corregida para A-Frame (Forward es -Z)
-    // Movimiento adelante/atrás
     pos.x += -ly * Math.sin(totalAngle) * currentSpeed;
     pos.z += -ly * Math.cos(totalAngle) * currentSpeed;
-    // Movimiento lateral (Strafe)
     pos.x += lx * Math.cos(totalAngle) * currentSpeed;
     pos.z += -lx * Math.sin(totalAngle) * currentSpeed;
 
-    // --- ROTACIÓN / HEADING (Stick Derecho) ---
+    // --- ROTACIÓN ---
     const rx = Math.abs(gp.axes[2]) > DEADZONE ? gp.axes[2] : 0;
     if (rx !== 0) {
         rigRot.y -= rx * 2.5; 
         rig.setAttribute('rotation', rigRot);
     }
 
-    // --- ASCENSO / DESCENSO (Gatillos) ---
-    if (gp.buttons[7].pressed) pos.y -= currentSpeed * 0.8; // R2: Bajar
-    if (gp.buttons[6].pressed) pos.y += currentSpeed * 0.8; // L2: Subir
+    // --- ASCENSO / DESCENSO ---
+    if (gp.buttons[7].pressed) pos.y -= currentSpeed * 0.8; 
+    if (gp.buttons[6].pressed) pos.y += currentSpeed * 0.8; 
 
-    // --- ZOOM (L1/R1 y D-PAD Arriba/Abajo) ---
-    // R1 (5) o D-Pad Arriba (12) -> Zoom In
+    // --- ZOOM ---
     if (gp.buttons[5].pressed || gp.buttons[12].pressed) fov = Math.max(5, fov - 1);
-    // L1 (4) o D-Pad Abajo (13) -> Zoom Out
     if (gp.buttons[4].pressed || gp.buttons[13].pressed) fov = Math.min(140, fov + 1);
 
-    // --- VELOCIDAD (D-PAD Izquierda/Derecha) ---
+    // --- VELOCIDAD (D-PAD) ---
     if (gp.buttons[15].pressed && !debounce.speed) {
-        if (currentLevelIndex < speedLevels.length - 1) currentLevelIndex++;
+        if (currentLevelIndex < speedLevels.length - 1) {
+            currentLevelIndex++;
+            updateSpeedUI();
+        }
         debounce.speed = true; setTimeout(() => debounce.speed = false, 200);
     }
     if (gp.buttons[14].pressed && !debounce.speed) {
-        if (currentLevelIndex > 0) currentLevelIndex--;
+        if (currentLevelIndex > 0) {
+            currentLevelIndex--;
+            updateSpeedUI();
+        }
         debounce.speed = true; setTimeout(() => debounce.speed = false, 200);
     }
 
-    // --- BOTONES DE FIGURAS ---
-    if (gp.buttons[3].pressed && !debounce.light) { // Triángulo
+    // --- BOTONES ---
+    if (gp.buttons[3].pressed && !debounce.light) { 
         lightToggle.click();
         debounce.light = true; setTimeout(() => debounce.light = false, 400);
     }
-    if (gp.buttons[1].pressed && !debounce.menu) { // Círculo
-        window.location.href = '/./index.html';
+    if (gp.buttons[1].pressed && !debounce.menu) { 
+        window.location.href = '../index.html'; // Ruta corregida a relativa
         debounce.menu = true;
     }
-    if (gp.buttons[0].pressed && !debounce.hud) { // Cruz
+    if (gp.buttons[0].pressed && !debounce.hud) { 
         hudToggle.click();
         debounce.hud = true; setTimeout(() => debounce.hud = false, 400);
     }
-    if (gp.buttons[2].pressed && !debounce.reset) { // Cuadrado
+    if (gp.buttons[2].pressed && !debounce.reset) { 
         resetBtn.click();
         debounce.reset = true; setTimeout(() => debounce.reset = false, 400);
     }
@@ -92,11 +97,17 @@ fsToggle.onclick = () => {
 };
 
 document.getElementById('speed-plus').onclick = () => { 
-    if (currentLevelIndex < speedLevels.length-1) currentLevelIndex++; 
+    if (currentLevelIndex < speedLevels.length-1) {
+        currentLevelIndex++; 
+        updateSpeedUI();
+    }
 };
 
 document.getElementById('speed-minus').onclick = () => { 
-    if (currentLevelIndex > 0) currentLevelIndex--; 
+    if (currentLevelIndex > 0) {
+        currentLevelIndex--; 
+        updateSpeedUI();
+    }
 };
 
 resetBtn.onclick = () => { 
@@ -112,7 +123,21 @@ lightToggle.addEventListener('click', () => {
     lightToggle.style.color = lightsOn ? "#fff" : "#ff4444";
 });
 
+// Lógica de 3 modos para el HUD
 hudToggle.addEventListener('click', () => {
-    isHudVisible = !isHudVisible;
-    hidableElements.forEach(el => el.classList.toggle('ui-hidden', !isHudVisible));
+    hudMode = (hudMode + 1) % 3; 
+
+    // Primero ocultamos todo lo que tenga la clase 'hidable'
+    hidableElements.forEach(el => el.classList.add('ui-hidden'));
+
+    if (hudMode === 0) {
+        // MODO 0: MOSTRAR TODO
+        hidableElements.forEach(el => el.classList.remove('ui-hidden'));
+    } 
+    else if (hudMode === 1) {
+        // MODO 1: SOLO TELEMETRÍA Y FECHA
+        if (telemetryBlock) telemetryBlock.classList.remove('ui-hidden');
+        if (dateBlock) dateBlock.classList.remove('ui-hidden');
+    }
+    // MODO 2: No se hace nada, permanece todo oculto (el botón HUD nunca tiene 'hidable')
 });

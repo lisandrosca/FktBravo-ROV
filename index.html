@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIDA EN LOS EXTREMOS - Mission Control</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/menu-styles.css">
 </head>
@@ -16,51 +17,56 @@
         <div class="expedition-tag">Expedición FKt251206 Bravo | R/V Falkor (too)</div>
     </header>
 
-    <div class="mission-grid">
+    <main class="mission-grid">
+        
         <a href="habitats/whale_fall.html" class="mission-card">
             <div class="card-img-container">
-                <img src="assets/images/whale_fall.jpg" alt="Ambiente" class="card-img img-env">
-                <img src="assets/images/whale_fall_close.jpg" alt="Detalle" class="card-img img-closeup">
+                <img src="assets/images/whale_fall.jpg" alt="Ambiente Whale Fall" class="card-img img-env">
+                <img src="assets/images/whale_fall_close.jpg" alt="Detalle Whale Fall" class="card-img img-closeup">
             </div>
             <div class="card-body">
                 <div class="dive-id">DIVE S0883</div>
                 <div class="dive-title">The Whale Fall</div>
-                <div class="dive-stats"><span>PROFUNDIDAD: 3895 M</span></div>
+                <div class="dive-stats"><span>PROFUNDIDAD: 3895 m</span></div>
                 <div class="launch-btn">LAUNCH DIVE</div>
             </div>
         </a>
 
-        <a href="habitats/clam_bed.html" class="mission-card">
+        <div class="mission-card disabled">
             <div class="card-img-container">
-                <img src="assets/images/clam_bed.jpg" alt="Ambiente" class="card-img img-env">
-                <img src="assets/images/clam_bed_close.jpg" alt="Detalle" class="card-img img-closeup">
+                <img src="assets/images/clam_bed.jpg" alt="Ambiente Clam Beds" class="card-img img-env">
+                <img src="assets/images/clam_bed_close.jpg" alt="Detalle Clam Beds" class="card-img img-closeup">
             </div>
             <div class="card-body">
                 <div class="dive-id">DIVE S0889</div>
-                <div class="dive-title">Clam Beds<br>(Vesicomyidae sp.)</div>
-                <div class="dive-stats"><span>PROFUNDIDAD: 690 M</span></div>
-                <div class="launch-btn">LAUNCH DIVE</div>
+                <div class="dive-title">Clam Beds<br>(Vesicomyidae)</div>
+                <div class="dive-stats"><span>PROFUNDIDAD: 618 m</span></div>
+                <div class="launch-btn upcoming">PRÓXIMAMENTE</div>
             </div>
-        </a>
+        </div>
 
-        <a href="habitats/giant_corals.html" class="mission-card">
+        <div class="mission-card disabled">
             <div class="card-img-container">
-                 <img src="assets/images/giant_corals.jpg" alt="Ambiente" class="card-img img-env">
-                <img src="assets/images/giant_corals_close.jpg" alt="Detalle" class="card-img img-closeup">
+                <img src="assets/images/giant_corals.jpg" alt="Ambiente Giant Corals" class="card-img img-env">
+                <img src="assets/images/giant_corals_close.jpg" alt="Detalle Giant Corals" class="card-img img-closeup">
             </div>
             <div class="card-body">
                 <div class="dive-id">DIVE S0892</div>
                 <div class="dive-title">Giant Corals<br>(Paragorgia sp.)</div>
-                <div class="dive-stats"><span>PROFUNDIDAD: 420 M</span></div>
-                <div class="launch-btn">LAUNCH DIVE</div>
+                <div class="dive-stats"><span>PROFUNDIDAD: 483 m</span></div>
+                <div class="launch-btn upcoming">PRÓXIMAMENTE</div>
             </div>
-        </a>
-    </div>
+        </div>
 
-    <footer>EST. 2026 | Lisandro Scarrone</footer>
+    </main>
+
+    <footer>
+        <p>EST. 2026 | Lisandro Scarrone</p>
+    </footer>
 
     <script>
         document.querySelectorAll('.mission-card').forEach(card => {
+            // Optimización para feedback visual en dispositivos táctiles
             card.addEventListener('touchstart',  function() { this.classList.add('is-touching'); }, {passive: true});
             card.addEventListener('touchend',    function() { this.classList.remove('is-touching'); }, {passive: true});
             card.addEventListener('touchcancel', function() { this.classList.remove('is-touching'); }, {passive: true});
