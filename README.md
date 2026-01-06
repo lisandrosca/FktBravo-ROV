@@ -8,12 +8,13 @@ La interfaz emula el sistema de telemetría y control de un ROV real, integrando
 
 🌊 Ambientes Explorables
  * S0883 - The Whale Fall.
- * S0890 - Clam Beds.
- * S0892 - Giant Corals.
+ * S0890 - Clam Beds. Próximamente.
+ * S0892 - Giant Corals. Próximamente.
 
 🚀 Características Técnicas
- * Motor: Desarrollado con A-Frame para garantizar compatibilidad con WebVR y dispositivos móviles sin necesidad de aplicaciones externas.
+ * Motor: Desarrollado con A-Frame para garantizar compatibilidad con WebVR y dispositivos móviles.
  * Interfaz de Usuario (HUD): Inspirada en la consola de operaciones del Schmidt Ocean Institute (SOI), con telemetría dinámica en tiempo real.
+
   * Créditos y Reconocimientos
 Este proyecto es el resultado de la colaboración y el esfuerzo científico durante la campaña FKt251206 Bravo (2025-2026).
  * Institución: Schmidt Ocean Institute (SOI) por facilitar la plataforma de investigación R/V Falkor (too) y el ROV SuBastian.
