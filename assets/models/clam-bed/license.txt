@@ -1,0 +1,11 @@
+Model Information:
+* title:	FKt Clam Bed - Partial Survey Render
+* source:	https://sketchfab.com/3d-models/fkt-clam-bed-partial-survey-render-d55a372d074a45b99c03e46d7c70aae5
+* author:	DeepSeaBEE (https://sketchfab.com/DeepSeaBEE)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "FKt Clam Bed - Partial Survey Render" (https://sketchfab.com/3d-models/fkt-clam-bed-partial-survey-render-d55a372d074a45b99c03e46d7c70aae5) by DeepSeaBEE (https://sketchfab.com/DeepSeaBEE) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

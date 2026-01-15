@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ROV Mission Control - V1.0</title>
+    <title>ROV Mission Control</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <link rel="stylesheet" href="../css/rov-styles.css">
 </head>
@@ -11,15 +11,18 @@
 
     <div id="ui-layer">
         <div id="telemetry-block" class="hidable">
-            <div class="data-row"><span class="data-label">HEADING</span><span class="data-val"><span id="head-val">319</span> °</span></div>
-            <div class="data-row"><span class="data-label">DEPTH</span><span class="data-val"><span id="depth-val">3895</span> M</span></div>
-            <div class="data-row"><span class="data-label">TEMP.</span><span class="data-val">0.327 °C</span></div>
-            <div class="data-row"><span class="data-label">SALINITY</span><span class="data-val">34.67 PSU</span></div>
-            <div class="data-row"><span class="data-label">O2 CON</span><span class="data-val">262 µM</span></div>
-            <div class="data-row"><span class="data-label">O2 SAT</span><span class="data-val">58.1 %</span></div>
+            <div class="data-row"><span class="data-label">SITE</span><span class="data-val" id="ui-title">LOADING...</span></div>
+            <div class="data-row"><span class="data-label">ID</span><span class="data-val" id="ui-id">...</span></div>
+            
+            <div class="data-row"><span class="data-label">HEADING</span><span class="data-val"><span id="head-val">000</span> °</span></div>
+            <div class="data-row"><span class="data-label">DEPTH</span><span class="data-val"><span id="depth-val">0</span> M</span></div>
+            
+            <div class="data-row"><span class="data-label">TEMP.</span><span class="data-val"><span id="ui-temp">0.00</span> °C</span></div>
+            <div class="data-row"><span class="data-label">SALINITY</span><span class="data-val"><span id="ui-salinity">00.00</span> PSU</span></div>
+            <div class="data-row"><span class="data-label">O2 CON</span><span class="data-val"><span id="ui-o2">000</span> µM</span></div>
         </div>
 
-        <div id="date-block" class="hidable">2025-12-21</div>
+        <div id="date-block" class="hidable">--/--/--</div>
 
         <div class="top-left-ctrls">
             <div id="hud-toggle" class="icon-btn hidable">
@@ -39,7 +42,7 @@
             </div>
         </div>
 
-        <div id="debug-console" class="hidable">SYSTEM: Starting dive...</div>
+        <div id="debug-console" class="hidable">SYSTEM: Initializing...</div>
 
         <div id="controls-container" class="hidable">
             <div class="control-group">
@@ -67,24 +70,25 @@
         </div>
     </div>
 
-    <a-scene renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: true">
-        <a-assets><a-asset-item id="whale-scene" src="../assets/models/whale-fall/scene.gltf"></a-asset-item></a-assets>
-        <a-sky color="#00050a"></a-sky>
+    <a-scene renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: false">
+        <a-sky color="#050505"></a-sky>
         <a-grid opacity="0.1" cellColor="#fff"></a-grid>
-        <a-entity id="map-entity" gltf-model="#whale-scene"></a-entity>
-        <a-entity id="camera-rig" position="0 1.6 0">
+        
+        <a-entity id="map-entity" position="0 0 0"></a-entity>
+
+        <a-entity id="camera-rig" position="0 1.6 5">
             <a-entity id="main-camera" camera="fov: 80" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true;">
                 <a-light id="rov-spot" type="spot" intensity="2.5" distance="50" angle="45"></a-light>
                 <a-light id="rov-point" type="point" intensity="0.8" distance="15" position="0 0 -1"></a-light>
             </a-entity>
         </a-entity>
-        <a-light type="hemisphere" intensity="0.4"></a-light>
+        <a-light type="hemisphere" intensity="0.4" groundColor="#000"></a-light>
     </a-scene>
 
     <script src="../js/rov-config.js"></script>
     <script src="../js/rov-controls.js"></script>
+    <script src="../js/loader.js"></script> 
     <script src="../js/rov-main.js"></script>
 
 </body>
-<footer>EST. 2026 | Lisandro Scarrone | 3D models by Ben Erwin</footer>
 </html>

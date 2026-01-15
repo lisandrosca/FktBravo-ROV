@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ROV Mission Control</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="../css/rov-styles.css">
+</head>
+<body>
+
+    <div id="ui-layer">
+        <div id="telemetry-block" class="hidable">
+            <div class="data-row"><span class="data-label">SITE</span><span class="data-val" id="ui-title">LOADING...</span></div>
+            <div class="data-row"><span class="data-label">ID</span><span class="data-val" id="ui-id">...</span></div>
+            
+            <div class="data-row"><span class="data-label">HEADING</span><span class="data-val"><span id="head-val">000</span> °</span></div>
+            <div class="data-row"><span class="data-label">DEPTH</span><span class="data-val"><span id="depth-val">0</span> M</span></div>
+            
+            <div class="data-row"><span class="data-label">TEMP.</span><span class="data-val"><span id="ui-temp">0.00</span> °C</span></div>
+            <div class="data-row"><span class="data-label">SALINITY</span><span class="data-val"><span id="ui-salinity">00.00</span> PSU</span></div>
+            <div class="data-row"><span class="data-label">O2 CON</span><span class="data-val"><span id="ui-o2">000</span> µM</span></div>
+        </div>
+
+        <div id="date-block" class="hidable">--/--/--</div>
+
+        <div class="top-left-ctrls">
+            <div id="hud-toggle" class="icon-btn">
+                <svg><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+            <div id="fullscreen-toggle" class="icon-btn hidable">
+                <svg><path d="M15 3h6v6M9 21H3v-6M21 15v6h-6M3 9V3h6"></path></svg>
+            </div>
+            <div id="light-toggle" class="icon-btn hidable">
+                <svg id="light-icon"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path><circle cx="12" cy="12" r="5"></circle></svg>
+            </div>
+            <div id="reset-pos" class="icon-btn hidable">
+                <svg><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </div>
+            <div id="back-to-menu" class="icon-btn hidable" onclick="window.location.href='../index.html'" title="Volver al Menú">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </div>
+        </div>
+
+        <div id="debug-console" class="hidable">SYSTEM: Initializing...</div>
+
+        <div id="controls-container" class="hidable">
+            <div class="control-group">
+                <div class="btn" id="move-up"><svg><polyline points="18 15 12 9 6 15"></polyline></svg></div>
+                <div class="row">
+                    <div class="btn" id="move-left"><svg><polyline points="15 18 9 12 15 6"></polyline></svg></div>
+                    <div class="btn" id="move-down"><svg><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+                    <div class="btn" id="move-right"><svg><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="control-group"><span class="label">SPD</span>
+                    <div class="btn" id="speed-plus"><svg><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
+                    <div class="btn" id="speed-minus" style="margin-top:5px;"><svg><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
+                </div>
+                <div class="control-group"><span class="label">ZOM</span>
+                    <div class="btn" id="zoom-in"><svg><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></div>
+                    <div class="btn" id="zoom-out" style="margin-top:5px;"><svg><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></div>
+                </div>
+                <div class="control-group"><span class="label">VRT</span>
+                    <div class="btn" id="ascend"><svg><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg></div>
+                    <div class="btn" id="descend" style="margin-top:5px;"><svg><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a-scene renderer="antialias: true; colorManagement: true;" vr-mode-ui="enabled: false">
+        <a-sky color="#050505"></a-sky>
+        <a-grid opacity="0.1" cellColor="#fff"></a-grid>
+        
+        <a-entity id="map-entity" position="0 0 0"></a-entity>
+
+        <a-entity id="camera-rig" position="0 1.6 5">
+            <a-entity id="main-camera" camera="fov: 80" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true;">
+                <a-light id="rov-spot" type="spot" intensity="2.5" distance="50" angle="45"></a-light>
+                <a-light id="rov-point" type="point" intensity="0.8" distance="15" position="0 0 -1"></a-light>
+            </a-entity>
+        </a-entity>
+        <a-light type="hemisphere" intensity="0.4" groundColor="#000"></a-light>
+    </a-scene>
+
+    <script src="../js/rov-config.js"></script>
+    <script src="../js/rov-controls.js"></script>
+    <script src="../js/loader.js"></script> 
+    <script src="../js/rov-main.js"></script>
+
+</body>
+</html>
