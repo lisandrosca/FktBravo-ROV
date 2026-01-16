@@ -1,10 +1,14 @@
+// loader.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
     const pageName = path.split("/").pop().split(".")[0];
     const jsonKey = pageName.replace(/_/g, "-");
 
     console.log(`[Loader] Init: ${jsonKey}`);
-    const debugConsole = document.getElementById('debug-console'); // Para mostrar errores en pantalla
+    const debugConsole = document.getElementById('debug-console'); 
+
+    initGyroToggle();
 
     fetch('../data/dives.json')
         .then(res => {
@@ -24,6 +28,56 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error cargando la misión. Revisa la consola.");
         });
 });
+
+function initGyroToggle() {
+    const gyroBtn = document.getElementById('gyro-toggle');
+    const cameraEl = document.getElementById('main-camera');
+    const debugConsole = document.getElementById('debug-console');
+
+    if (!gyroBtn || !cameraEl) return;
+
+    gyroBtn.addEventListener('click', async () => {
+        // Manejo de permisos para iOS
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permissionState = await DeviceOrientationEvent.requestPermission();
+                if (permissionState !== 'granted') {
+                    if(debugConsole) debugConsole.textContent = "SYSTEM: Gyro permission denied.";
+                    return;
+                }
+            } catch (error) {
+                console.error(error);
+                return;
+            }
+        }
+
+        const controls = cameraEl.components['look-controls'];
+        const isEnabled = cameraEl.getAttribute('look-controls').magicWindowTrackingEnabled;
+
+        if (isEnabled) {
+            // --- AL DESACTIVAR (Solución al Snap) ---
+            const currentRotationX = cameraEl.object3D.rotation.x;
+            const currentRotationY = cameraEl.object3D.rotation.y;
+
+            cameraEl.setAttribute('look-controls', { magicWindowTrackingEnabled: false });
+
+            if (controls) {
+                controls.pitch = currentRotationX;
+                controls.yaw = currentRotationY;
+            }
+            
+            gyroBtn.classList.remove('active');
+            if(debugConsole) debugConsole.textContent = "SYSTEM: Gyroscope OFF";
+
+        } else {
+            // --- AL ACTIVAR ---
+            cameraEl.setAttribute('look-controls', { magicWindowTrackingEnabled: true });
+            
+            gyroBtn.classList.add('active');
+            if(debugConsole) debugConsole.textContent = "SYSTEM: Gyroscope ON";
+        }
+    });
+}
 
 function updateUI(data) {
     const setText = (id, val) => {
@@ -48,17 +102,11 @@ function loadModelDirectly(url) {
     if (!mapEntity) return;
 
     debugConsole.textContent = "SYSTEM: Loading 3D Model...";
-
-    // 1. Limpiamos cualquier modelo previo
     mapEntity.removeAttribute('gltf-model');
 
-    // 2. Escuchamos eventos de carga ANTES de asignar el modelo
     mapEntity.addEventListener('model-loaded', () => {
         console.log("[Loader] Model loaded successfully!");
         debugConsole.textContent = "SYSTEM: Model Loaded. Dive Active.";
-        
-        // Opcional: Ajustar escala si se ve muy chico/grande
-        // mapEntity.setAttribute('scale', '1 1 1'); 
     }, { once: true });
 
     mapEntity.addEventListener('model-error', (e) => {
@@ -66,6 +114,5 @@ function loadModelDirectly(url) {
         debugConsole.textContent = "SYSTEM ERROR: Could not load 3D model.";
     }, { once: true });
 
-    // 3. Asignamos la URL directa. Esto fuerza la carga inmediata.
     mapEntity.setAttribute('gltf-model', url);
 }

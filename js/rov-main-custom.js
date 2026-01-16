@@ -1,81 +1,114 @@
+// js/rov-main-custom.js
+
 ROV.refs.mapEntity.addEventListener('model-loaded', () => {
     const mesh = ROV.refs.mapEntity.getObject3D('mesh');
     if (!mesh) return;
 
+    // Detectamos la carpeta base donde está el modelo (ej: .../giant-corals/)
     const currentSrc = ROV.refs.mapEntity.getAttribute('gltf-model');
     const basePath = currentSrc.substring(0, currentSrc.lastIndexOf('/') + 1);
     
-    console.log(`[Main] Model Base Path detected: ${basePath}`);
+    console.log(`[Custom Main] Model Base Path: ${basePath}`);
 
-    const loader = new THREE.TextureLoader();
+            const loader = new THREE.TextureLoader();
+
     mesh.traverse(node => {
         if (node.isMesh) {
             const materials = Array.isArray(node.material) ? node.material : [node.material];
+            
             materials.forEach(mat => {
-                mat.side = THREE.DoubleSide;
-                const match = node.name.match(/material(\d+)/i);
-                if (match) {
-                    const textureUrl = `${basePath}textures/material${match[1]}_diffuse.jpeg`;
+                mat.side = THREE.DoubleSide; 
+                
+                // Debug: Ver qué materiales está encontrando
+                // console.log("Processing material:", mat.name);
+
+                if (mat.name) {
+                    const baseName = mat.name; 
                     
-                    mat.map = loader.load(textureUrl, (tex) => {
+                    // --- 1. BASE COLOR ---
+                    const colorPath = `${basePath}textures/${baseName}_baseColor.png`;
+                    mat.map = loader.load(colorPath, (tex) => {
                         tex.encoding = THREE.sRGBEncoding;
                         tex.flipY = false;
-                    }, undefined, (err) => {
-                        console.warn(`[Main] Texture load failed for: ${textureUrl}`);
+                        
+                        // --- EL FIX PRINCIPAL ESTÁ AQUÍ ---
+                        // Le decimos que si el modelo lo pide, repita la textura
+                        // en lugar de estirar el último pixel.
+                        tex.wrapS = THREE.RepeatWrapping;
+                        tex.wrapT = THREE.RepeatWrapping;
                     });
+
+                    // --- 2. NORMAL MAP ---
+                    const normalPath = `${basePath}textures/${baseName}_normal.png`;
+                    mat.normalMap = loader.load(normalPath, (tex) => {
+                        tex.flipY = false;
+                        tex.wrapS = THREE.RepeatWrapping;
+                        tex.wrapT = THREE.RepeatWrapping;
+                    });
+
+                    // --- 3. METALLIC / ROUGHNESS ---
+                    const mrPath = `${basePath}textures/${baseName}_metallicRoughness.png`;
+                    const mrTexture = loader.load(mrPath, (tex) => {
+                        tex.flipY = false;
+                        tex.wrapS = THREE.RepeatWrapping;
+                        tex.wrapT = THREE.RepeatWrapping;
+                    });
+                    
+                    mat.metalnessMap = mrTexture;
+                    mat.roughnessMap = mrTexture;
+
                     mat.needsUpdate = true;
                 }
             });
         }
     });
 
+
+
+    // --- CÓDIGO DE ESCALADO Y CENTRADO AUTOMÁTICO (Idéntico al original) ---
     const bbox = new THREE.Box3().setFromObject(mesh);
     const size = new THREE.Vector3();
     bbox.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z);
     
-    // Auto-escala: ajusta cualquier modelo para que mida aprox 20 unidades
+    // Escalar a aprox 20 unidades
     const scaleFactor = 20 / maxDim;
     ROV.refs.mapEntity.setAttribute('scale', `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
     
     const center = new THREE.Vector3();
     bbox.getCenter(center);
     
-    // Centrar el modelo
+    // Centrar en el mundo
     ROV.refs.mapEntity.setAttribute('position', { 
         x: -center.x * scaleFactor, 
         y: (-center.y * scaleFactor) - 2, 
         z: (-center.z * scaleFactor) - 10 
     });
 
-    // Guardamos la velocidad base calculada en la Configuración Global
+    // Recalcular velocidad base según tamaño
     ROV.config.baseMoveSpeed = 0.02 + (Math.log10(maxDim + 1) * 0.03);
     
     if(ROV.refs.debug) {
-        ROV.refs.debug.innerText = "SYSTEM: ROV Online - Dive Active";
+        ROV.refs.debug.innerText = "SYSTEM: Custom Model Online";
         setTimeout(() => { ROV.refs.debug.style.opacity = "0"; }, 5000);
     }
 });
 
-// NUEVO: Función de arranque para inicializar controles personalizados
+// --- INIT SYSTEMS (Idéntico al original) ---
+
 function initSystem() {
-    // 1. Inicializar lógica de rotación táctil personalizada
     if(typeof initTouchRotation === 'function') {
         initTouchRotation();
-        console.log("[Main] Custom Touch Rotation Initialized");
+        console.log("[Custom Main] Touch Rotation Initialized");
     }
 
-    // 2. Desactivar el touch nativo de A-Frame en la cámara para evitar conflictos
-    // Mantenemos mouseEnabled false para que no secuestre el clic en PC si no queremos
     if (ROV.refs.cam) {
         ROV.refs.cam.setAttribute('look-controls', {
             touchEnabled: false, 
             mouseEnabled: false,
-            magicWindowTrackingEnabled: true // Mantenemos giroscopio activo si se desea
+            magicWindowTrackingEnabled: true 
         });
     }
-
-    // Arrancamos el bucle principal
     updateLoop();
 }
 
@@ -83,22 +116,19 @@ function updateLoop() {
     const { cam, rig, headText, depthText } = ROV.refs;
     const { activeAction } = ROV.state;
 
-    // 1. Telemetría (Heading)
+    // Telemetría Heading
     const rot = cam.getAttribute('rotation');
     const rigRot = rig.getAttribute('rotation') || {y:0};
-    
     if(headText) {
         headText.innerText = Math.floor((360 - ((rot.y + rigRot.y) % 360)) % 360).toString().padStart(3, '0');
     }
 
-    // 2. Gamepad (Llama a physics internamente)
+    // Gamepad
     if(typeof updateGamepad === 'function') updateGamepad();
 
-    // 3. Controles Táctiles (Touch / Mouse) para MOVIMIENTO
+    // Touch Actions
     if (activeAction) {
         let fov = cam.getAttribute('camera').fov;
-        
-        // Mapeamos acciones a vectores (Surge, Sway, Heave)
         let surge = 0, sway = 0, heave = 0;
 
         if (activeAction === 'move-up')    surge = 1;
@@ -108,19 +138,17 @@ function updateLoop() {
         if (activeAction === 'ascend')     heave = 1;
         if (activeAction === 'descend')    heave = -1;
 
-        // Si hay movimiento físico, usamos la función centralizada
         if (surge !== 0 || sway !== 0 || heave !== 0) {
-            ROV.physics.applyMove(surge, sway, heave, false); // false = no turbo para touch
+            ROV.physics.applyMove(surge, sway, heave, false);
         }
 
-        // Zoom (Manejado aparte porque es propiedad de cámara, no posición)
         const zoomSpd = ROV.config.baseZoomSpeed;
         if (activeAction === 'zoom-in') fov = Math.max(5, fov - (zoomSpd * (fov/80)));
         if (activeAction === 'zoom-out') fov = Math.min(150, fov + (zoomSpd * (fov/80)));
         cam.setAttribute('camera', 'fov', fov);
     }
     
-    // 4. Telemetría (Profundidad)
+    // Telemetría Profundidad
     if(depthText && rig) {
         const bDepth = ROV.config.baseDepth || 0;
         depthText.innerText = Math.floor(bDepth - rig.getAttribute('position').y);
@@ -137,5 +165,4 @@ window.addEventListener("gamepadconnected", (e) => {
     }
 });
 
-// Iniciamos el sistema
 initSystem();
