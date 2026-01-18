@@ -216,12 +216,16 @@ if (speedMinus) {
 if (ROV.refs.resetBtn) {
     ROV.refs.resetBtn.classList.add('ui-clickable');
     ROV.refs.resetBtn.onclick = () => { 
-        ROV.refs.rig.setAttribute('position', "0 1.6 0"); 
+        // CAMBIO: Usamos la variable global en lugar de texto fijo
+        ROV.refs.rig.setAttribute('position', ROV.config.startingPosition); 
+        
+        // Reseteamos rotaciones a 0
         ROV.refs.rig.setAttribute('rotation', "0 0 0"); 
         ROV.refs.pivot.setAttribute('rotation', "0 0 0"); 
         ROV.refs.cam.setAttribute('rotation', "0 0 0"); 
     };
 }
+
 
 if (ROV.refs.lightToggle) {
     ROV.refs.lightToggle.classList.add('ui-clickable');

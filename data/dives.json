@@ -7,7 +7,9 @@
     "salinity": "34.67",
     "o2_con": "262",
     "date": "2025-12-21",
-    "model_path": "../assets/models/whale-fall/scene.gltf"
+    "model_path": "../assets/models/whale-fall/scene.gltf",
+    "starting_coords": "-10.69 0.17 -10.21",
+    "starting_rotation": "0 270 0"
   },
   "clam-bed": {
     "id": "S0889",
@@ -17,7 +19,9 @@
     "salinity": "34.42",
     "o2_con": "180",
     "date": "2026-01-05",
-    "model_path": "../assets/models/clam-bed/scene.gltf"
+    "model_path": "../assets/models/clam-bed/scene.gltf",
+    "starting_coords": "-7.76 -1.70 -13",
+    "starting_rotation": "0 90 0"
   },
   "giant-corals": {
     "id": "S0892",
@@ -27,6 +31,22 @@
     "salinity": "34.35",
     "o2_con": "210",
     "date": "2026-01-10",
-    "model_path": "../assets/models/giant-corals/scene.gltf"
+    "model_path": "../assets/models/giant-corals/scene.gltf",
+        "starting_coords": "-7.76 -1.70 -13",
+        "starting_rotation": "0 90 0"
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

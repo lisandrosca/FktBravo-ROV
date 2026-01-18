@@ -38,11 +38,12 @@ window.ROV = {
         baseDepth: 3895.0,
         deadzone: 0.15,
         baseZoomSpeed: 0.8,
-        // baseMoveSpeed se calculará dinámicamente al cargar el modelo
         baseMoveSpeed: 0.04,
-        // NUEVO: Sensibilidad para la rotación táctil
-        touchSensitivity: 0.15
+        touchSensitivity: 0.15,
+        startingPosition: "0 1.6 5" ,
+        startingRotation: "0 0 0"
     },
+
 
     // 3. Estado Mutable (Variables que cambian)
     state: {

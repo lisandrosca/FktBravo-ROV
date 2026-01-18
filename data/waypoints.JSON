@@ -1,0 +1,67 @@
+{
+  "whale-fall": [
+    {
+      "id": "wp-vertebra-sample",
+      "position": { "x": -1.19, "y": -1.84, "z": -9.14 },
+      "title": "Muestreo de Vértebra",
+      "icon": "video",
+      "content": {
+        "description": "Extracción de vértebra de ballena utilizando el brazo manipulador Schilling Titan 4. Se observa la consistencia ósea y la resuspensión de sedimento.",
+        "youtube_id": "dQw4w9WgXcQ", 
+        "video_caption": "Clip: Momento de la extracción - R/V Falkor (too)"
+      }
+    },
+    {
+      "id": "wp-daniel-photo",
+      "position": { "x": 2.74, "y": -1.84, "z": -10.50},
+      "title": "Procesamiento en Lab",
+      "icon": "image",
+      "content": {
+        "description": "Daniel sosteniendo la muestra recuperada tras su limpieza inicial. Se aprecia el tamaño masivo de la vértebra lumbar.",
+        "gallery": [
+          { "src": "../assets/photos/daniel_vertebra.jpg", "caption": "Daniel en el Wet Lab" },
+          { "src": "../assets/photos/vertebra_clean.jpg", "caption": "Detalle de la estructura ósea" }
+        ]
+      }
+    },
+    {
+      "id": "wp-isopods",
+      "position": { "x": 6.26, "y": -1.84, "z": -10.44 },
+      "title": "Ecología: Isópodos",
+      "icon": "eye",
+      "content": {
+        "description": "Close-up de isópodos realizando comportamiento de 'trencito' sobre el sustrato coralino.",
+        "gallery": [
+          { "src": "../assets/photos/isopods_macro.jpg", "caption": "Macrofotografía in situ" }
+        ]
+      }
+    },
+    {
+      "id": "wp-bone-stats",
+      "position": { "x": 5.29, "y": -1.84, "z": -10.05 },
+      "title": "Análisis Osteológico",
+      "icon": "info",
+      "content": {
+        "description": "Estimaciones preliminares basadas en la morfometría de los restos visibles.",
+        "stats": [
+          { "label": "Conteo Visible", "value": "14 Vértebras" },
+          { "label": "Longitud Est.", "value": "18.5 Metros" },
+          { "label": "Especie Probable", "value": "Balaenoptera musculus" }
+        ]
+      }
+    },
+    {
+      "id": "wp-edna",
+      "position": { "x": -7.76, "y": -1.84, "z": -10.91},
+      "title": "Resultados eDNA",
+      "icon": "chart",
+      "content": {
+        "description": "Análisis de ADN ambiental de la columna de agua circundante (niskin #4).",
+        "image_chart": "../assets/charts/edna_pie_chart.png",
+        "chart_caption": "Distribución de taxones por lecturas de secuenciación."
+      }
+    }
+  ],
+  "clam-bed": [],
+  "giant-corals": []
+}
