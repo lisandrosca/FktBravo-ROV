@@ -125,7 +125,15 @@ function updateLoop() {
         const bDepth = ROV.config.baseDepth || 0;
         depthText.innerText = Math.floor(bDepth - rig.getAttribute('position').y);
     }
-    
+
+     // 5: Actualización de Coordenadas en UI
+    if (ROV.refs.coordsBlock && ROV.refs.rig) {
+        const pos = ROV.refs.rig.getAttribute('position');
+        // Usamos toFixed(2) para que no baile tanto el número
+        ROV.refs.coordsBlock.innerText = 
+            `X: ${pos.x.toFixed(2)}  Y: ${pos.y.toFixed(2)}  Z: ${pos.z.toFixed(2)}`;
+    }
+
     requestAnimationFrame(updateLoop);
 }
 

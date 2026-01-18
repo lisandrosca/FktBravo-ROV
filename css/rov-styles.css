@@ -4,8 +4,8 @@ body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courie
 
 /* Telemetría SOI */
 #telemetry-block {
-    position: absolute; bottom: 40px; left: 40px;
-    font-size: 14px; line-height: 1.4;
+    position: absolute; bottom: 180px; left: 40px;
+    font-size: 12px; line-height: 1.4;
     text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
     text-transform: uppercase;
     transition: all 0.5s ease;
@@ -15,11 +15,29 @@ body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courie
 .data-val { font-weight: bold; }
 
 #date-block {
-    position: absolute; bottom: 30px; left: 50%;
+    position: absolute; 
+    bottom: 35px; 
+    left: 50%;
     transform: translateX(-50%);
-    font-size: 16px; font-weight: bold;
+    font-size: 13px; font-weight: bold;
     text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
+    color: #fff; 
+    pointer-events: none;
 }
+
+#coords-block {
+    position: absolute; 
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.8); 
+    color: #blue;
+    pointer-events: none;
+    z-index: 10;
+}
+
 
 .top-left-ctrls {
     position: absolute; top: 30px; left: 30px;
@@ -42,28 +60,117 @@ body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courie
     text-shadow: 1px 1px 2px #000;
 }
 
-/* CONTROLES */
+/* CONTROLES PRINCIPALES (Diseño Base / Portrait) */
 #controls-container {
-    position: absolute; bottom: 200px; right: 30px;
-    display: flex; flex-direction: column; gap: 20px;
-    pointer-events: auto;
+    position: absolute; 
+    bottom: 60px; 
+    left: 15px;  /* Margen izquierdo */
+    right: 15px; /* Margen derecho */
+    
+    /* Layout Horizontal: D-Pad Izq | Auxiliares Der */
+    display: flex; 
+    flex-direction: row; 
+    justify-content: space-between; /* La clave para separarlos */
+    align-items: flex-end; /* Alineados al fondo */
+    
+    pointer-events: none; /* El contenedor deja pasar clicks */
     transition: all 0.5s ease;
 }
-.control-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.row { display: flex; gap: 10px; }
-.btn {
-    width: 55px; height: 55px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1.5px solid #fff; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    color: #fff; cursor: pointer;
-}
-.label { font-size: 9px; opacity: 0.9; margin-bottom: 2px; text-transform: uppercase; color: #fff; font-weight: bold;}
 
+/* Grupos de botones individuales */
+.control-group { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 5px; /* Espacio reducido entre botones verticales */
+    pointer-events: auto; /* Los botones sí reciben clicks */
+}
+
+/* El grupo de la derecha (Velocidad, Zoom, Vertical) */
+#controls-container .row {
+    display: flex; 
+    gap: 8px; /* Espacio entre las columnas de la derecha */
+    pointer-events: auto;
+}
+
+/* ESTILO DE LOS BOTONES (Responsivo) */
+.btn {
+    /* CLAMP: Mínimo 40px, Ideal 13% del ancho, Máximo 55px */
+    width: clamp(40px, 13vw, 55px); 
+    height: clamp(40px, 13vw, 55px);
+    
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid #fff; 
+    border-radius: 50%;
+    
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    color: #fff; 
+    cursor: pointer;
+    backdrop-filter: blur(2px); /* Un toque moderno */
+}
+
+/* Iconos dentro de los botones también escalan un poco */
+.btn svg { 
+    width: 50%; 
+    height: 50%; 
+    stroke-width: 2; 
+}
+
+/* Etiquetas (SPD, ZOM, VRT) */
+.label { 
+    font-size: 10px; 
+    opacity: 0.9; 
+    margin-bottom: 3px; 
+    text-transform: uppercase; 
+    color: #fff; 
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* LANDSCAPE (Horizontal) */
 @media (orientation: landscape) {
-    #controls-container { bottom: 70px; left: 40px; right: 40px; flex-direction: row; justify-content: space-between; align-items: flex-end; }
-    #telemetry-block { bottom: 220px; }
+    #controls-container { 
+        bottom: 20px; 
+        left: 40px; 
+        right: 40px; 
+        flex-direction: row; 
+        justify-content: space-between; 
+        align-items: flex-end; 
+    }
+    #telemetry-block { bottom: 150px; }
     .top-left-ctrls { left: 280px; }
+
+    #debug-console { 
+    position: absolute; left: 285px;
+    }
+    .btn {
+        width: 55px; 
+        height: 55px;
+    }
 }
 
 .ui-hidden { opacity: 0 !important; pointer-events: none !important; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

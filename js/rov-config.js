@@ -16,6 +16,7 @@ window.ROV = {
         telemetryBlock: document.getElementById('telemetry-block'),
         controlsContainer: document.getElementById('controls-container'),
         dateBlock: document.getElementById('date-block'),
+        coordsBlock: document.getElementById('coords-block'),
         
         // Botones UI
         hudToggle: document.getElementById('hud-toggle'),
