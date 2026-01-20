@@ -19,27 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!data[jsonKey]) throw new Error(`Key "${jsonKey}" not found in JSON`);
             
             const diveData = data[jsonKey];
-            
-            // Lógica de Posicionamiento Inicial (Posición + Rotación)
-            const rig = document.getElementById('camera-rig');
-            
-            if (rig) {
-                // 1. Posición
-                if (diveData.starting_coords) {
-                    ROV.config.startingPosition = diveData.starting_coords;
-                    rig.setAttribute('position', diveData.starting_coords);
-                }
-                
-                // 2. Rotación (Heading)
-                if (diveData.starting_rotation) {
-                    ROV.config.startingRotation = diveData.starting_rotation;
-                    rig.setAttribute('rotation', diveData.starting_rotation);
-                    console.log(`[Loader] Setting start rotation: ${diveData.starting_rotation}`);
-                }
-            } 
-
-            // --- AQUÍ ESTABA EL ERROR: Sobraba una llave "}" ---
-
             updateUI(diveData);
             loadModelDirectly(diveData.model_path);
         })
