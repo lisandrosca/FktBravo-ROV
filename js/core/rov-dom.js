@@ -28,7 +28,8 @@ ROV.refs = {
     fsToggle: document.getElementById('fullscreen-toggle'),
     lightToggle: document.getElementById('light-toggle'),
     resetBtn: document.getElementById('reset-pos'),
-    
+    gyroToggle: document.getElementById('gyro-toggle'),
+
     // Luces
     rovSpot: document.getElementById('rov-spot'),
     rovPoint: document.getElementById('rov-point'),
@@ -36,3 +37,21 @@ ROV.refs = {
     // Grupos
     hidableElements: document.querySelectorAll('.hidable')
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
