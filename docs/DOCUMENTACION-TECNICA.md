@@ -115,6 +115,67 @@ Este script resuelve problemas comunes al importar modelos 3D que no tienen text
     * Calcula un factor de escala para que el modelo siempre tenga un tamaño "manejable" (aprox. 20 metros virtuales), independientemente de si se exportó en milímetros o kilómetros.
     * Ajusta la velocidad base (`baseMoveSpeed`) logarítmicamente según el tamaño: mapas más grandes permiten movimiento más rápido.
 
+ (Actualización)
+
+2.4. Sistema de Waypoints (rov-waypoints.js)
+Nueva funcionalidad (v1.1). Gestiona los puntos de interés interactivos distribuidos en el mapa.
+Ciclo de Vida:
+ * Init: Detecta la misión actual, carga el archivo data/waypoints.json y genera entidades 3D (A-Frame) en las coordenadas especificadas.
+ * Renderizado Adaptativo:
+   * Estado Lejos: Esfera pequeña, blanca y semitransparente ("Ghost").
+   * Estado Cerca (< 3.5m): Se transforma en un octaedro (diamante) que rota sobre su eje, aumenta de opacidad y escala verticalmente.
+ * Sincronización de UI:
+   * Al entrar en el radio de activación, hace visible el botón SCAN (#btn-scan) y la etiqueta EXPLORE (#explore-label) en la interfaz.
+   * Actualiza ROV.state.activeWaypoint con el ID del punto cercano.
+Optimización: La verificación de distancia (update) se ejecuta dentro del bloque Throttled del Main Loop (1 de cada 10 frames) para no saturar la CPU calculando distancias euclidianas 60 veces por segundo.
+2. En la Sección "2. Módulo Systems > 2.2. Gestor de Acciones",:
+ * scanWaypoint(): Verifica si hay un waypoint activo en el estado. Si existe, dispara un feedback visual en el botón (flash blanco/negro) y registra la interacción en consola (preparado para futura apertura de modales/videos).
+3. En la Sección "3. Módulo Input > 3.2. Controlador de Gamepad", actualizar:
+A. Gamepad (API HTML5)
+(...contenido existente...)
+ * Botón Contextual (A / Cruz / Button 0): Implementa lógica condicional:
+   * Si hay Waypoint cerca: Ejecuta scanWaypoint() (Interactuar).
+   * Si NO hay Waypoint: Ejecuta cycleHUD() (Cambiar interfaz).
+4. En la Sección "3. Módulo Input > 3.1. Teclado", actualizar:
+ * Interacción: Se ha mapeado la tecla Enter para activar scanWaypoint().
+5. En la Sección "4. Flujo de Aplicación > 4.3. Estructura de Datos", actualizar:
+4.3. Estructura de Datos
+A. Misiones (data/dives.json)
+Se agregaron coordenadas de inicio para evitar el "hardcoding" en el código.
+"nombre-mision": {
+  "id": "S0883",
+  "title": "The Whale Fall",
+  "depth": 3895,
+  "start_position": { "x": 0, "y": 2, "z": 10 }, 
+  "start_rotation": { "x": 0, "y": 0, "z": 0 },
+  "model_path": "..."
+}
+
+B. Puntos de Interés (data/waypoints.json) (NUEVO)
+Define la ubicación y contenido de los puntos interactivos.
+"nombre-mision": [
+  {
+    "id": "wp-unique-id",
+    "position": { "x": 10, "y": -2, "z": 5 },
+    "title": "Título del hallazgo",
+    "icon": "video", 
+    "content": { ... }
+  }
+]
+
+Interfaz de Usuario (UI)
+5. Arquitectura de Interfaz (CSS Grid)
+Para garantizar la alineación perfecta de los controles en pantalla, se migró de un posicionamiento absoluto manual a un sistema de CSS Grid Layout.
+Contenedor Derecho (.right-grid-layout):
+Utiliza una grilla de 3x3 celdas para alinear los botones de Velocidad (SPD), Zoom (ZOM) y Vertical (VRT).
+ * Fila Superior:
+   * Celdas 1-2: Etiqueta "EXPLORE" (centrada).
+   * Celda 3: Botón SCAN (contextual).
+ * Fila Inferior: Botones de control estándar.
+Comportamiento:
+Los elementos contextuales (#btn-scan, #explore-label) utilizan opacity: 0 y pointer-events: none cuando están inactivos, pero mantienen su espacio reservado en la grilla (o colapsan controladamente) para evitar saltos bruscos en la disposición de los botones inferiores.
+
+
 ---
 
 

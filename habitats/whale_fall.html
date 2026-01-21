@@ -6,10 +6,6 @@
     <title>ROV Mission Control</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <link rel="stylesheet" href="../css/rov-styles.css">
-    <style>
-        /* Pequeño ajuste para indicar estado activo en botones */
-        .icon-btn.active svg { stroke: #00ff00; filter: drop-shadow(0 0 5px #00ff00); }
-    </style>
 </head>
 <body>
 
@@ -40,6 +36,7 @@
         <div id="debug-console" class="hidable">SYSTEM: Initializing...</div>
 
         <div id="controls-container" class="hidable">
+            
             <div class="control-group">
                 <div class="btn" id="move-up"><svg><use href="#icon-arrow-up"></use></svg></div>
                 <div class="row">
@@ -49,21 +46,36 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="right-grid-layout">
+                
+                <div class="grid-header-explore ui-hidden" id="explore-label">EXPLORE</div>
+                
+                <div class="grid-header-scan">
+                    <div class="btn ui-hidden" id="btn-scan">
+                        <svg><use href="#icon-scan"></use></svg>
+                    </div>
+                </div>
+
                 <div class="control-group">
                     <span class="label">SPD <span id="speed-val" style="color:#00ff00; font-size:0.8em;">1.0</span></span>
                     <div class="btn" id="speed-plus"><svg><use href="#icon-plus"></use></svg></div>
                     <div class="btn" id="speed-minus" style="margin-top:5px;"><svg><use href="#icon-minus"></use></svg></div>
                 </div>
-                <div class="control-group"><span class="label">ZOM</span>
+
+                <div class="control-group">
+                    <span class="label">ZOM</span>
                     <div class="btn" id="zoom-in"><svg><use href="#icon-zoom-in"></use></svg></div>
                     <div class="btn" id="zoom-out" style="margin-top:5px;"><svg><use href="#icon-zoom-out"></use></svg></div>
                 </div>
-                <div class="control-group"><span class="label">VRT</span>
+
+                <div class="control-group">
+                    <span class="label">VRT</span>
                     <div class="btn" id="ascend"><svg><use href="#icon-chevrons-up"></use></svg></div>
                     <div class="btn" id="descend" style="margin-top:5px;"><svg><use href="#icon-chevrons-down"></use></svg></div>
                 </div>
+
             </div>
+
         </div>
     </div>
 
@@ -106,9 +118,18 @@
         
         <symbol id="icon-chevrons-up" viewBox="0 0 24 24"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></symbol>
         <symbol id="icon-chevrons-down" viewBox="0 0 24 24"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></symbol>
+
+        <symbol id="icon-scan" viewBox="0 0 24 24">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+            <line x1="12" y1="2" x2="12" y2="5"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="5" y2="12"/>
+            <line x1="19" y1="12" x2="22" y2="12"/>
+        </symbol>
     </svg>
 
-        <script src="../js/core/rov-init.js"></script>
+    <script src="../js/core/rov-init.js"></script>
     <script src="../js/core/rov-settings.js"></script>
     <script src="../js/core/rov-state.js"></script>
     <script src="../js/core/rov-dom.js"></script>
@@ -116,6 +137,7 @@
     <script src="../js/systems/rov-physics.js"></script>
     <script src="../js/systems/rov-actions.js"></script>
     <script src="../js/systems/rov-model-handler.js"></script>
+    <script src="../js/systems/rov-waypoints.js"></script>
     
     <script src="../js/input/rov-input-keyboard.js"></script>
     <script src="../js/input/rov-controls.js"></script>
@@ -123,22 +145,5 @@
     <script src="../js/loader.js"></script> 
     <script src="../js/rov-main.js"></script>
 
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

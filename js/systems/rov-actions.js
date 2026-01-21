@@ -1,6 +1,5 @@
 // rov-actions.js
 // Centraliza las acciones discretas (On/Off, Toggles, Resets)
-// para que puedan ser llamadas desde cualquier input (Touch, Gamepad, Teclado).
 
 ROV.actions = {
     toggleLights: function() {
@@ -13,7 +12,6 @@ ROV.actions = {
         // Feedback visual en botón UI
         if (ROV.refs.lightToggle) {
             ROV.refs.lightToggle.style.color = ROV.state.lightsOn ? "#fff" : "#ff4444";
-            // Forzar actualización visual del icono si es necesario
         }
     },
 
@@ -34,19 +32,26 @@ ROV.actions = {
             // Modo 1: Solo Datos
             if (ROV.refs.telemetryBlock) ROV.refs.telemetryBlock.classList.remove('ui-hidden');
             if (ROV.refs.dateBlock) ROV.refs.dateBlock.classList.remove('ui-hidden');
-            // Mantenemos el toggle del HUD visible siempre para poder cambiar
             if (ROV.refs.hudToggle) ROV.refs.hudToggle.classList.remove('ui-hidden');
         }
-        // Modo 2: Nada (Cinemático) - Solo dejamos el botón para volver
+        // Modo 2: Nada (Cinemático)
         if (ROV.refs.hudToggle) ROV.refs.hudToggle.classList.remove('ui-hidden');
     },
 
     resetPosition: function() {
         if (!ROV.refs.rig) return;
-        ROV.refs.rig.setAttribute('position', "0 1.6 0"); 
-        ROV.refs.rig.setAttribute('rotation', "0 0 0"); 
+
+        // Usar la posición definida en el JSON (cargada en loader.js) o un default seguro
+        const startPos = (ROV.config && ROV.config.startPosition) ? ROV.config.startPosition : {x: 0, y: 1.6, z: 0};
+        const startRot = (ROV.config && ROV.config.startRotation) ? ROV.config.startRotation : {x: 0, y: 0, z: 0};
+
+        ROV.refs.rig.setAttribute('position', startPos); 
+        ROV.refs.rig.setAttribute('rotation', startRot); 
+        
         if(ROV.refs.pivot) ROV.refs.pivot.setAttribute('rotation', "0 0 0"); 
         if(ROV.refs.cam) ROV.refs.cam.setAttribute('rotation', "0 0 0"); 
+        
+        console.log("ROV Reset to:", startPos);
     },
 
     toggleFullscreen: function() {
@@ -67,5 +72,41 @@ ROV.actions = {
 
         ROV.state.currentLevelIndex = idx;
         ROV.physics.updateSpeedUI();
+    },
+
+    // --- NUEVA FUNCIÓN CONTEXTUAL ---
+    scanWaypoint: function() {
+        const wpId = ROV.state.activeWaypoint;
+        
+        if (wpId) {
+            console.log(`[SYSTEM] Scanning Target: ${wpId}`);
+            
+            // Feedback Visual: Parpadeo del botón
+            const btn = document.getElementById('btn-scan');
+            if(btn) {
+                // Flash blanco para indicar foto/scan
+                const originalBg = btn.style.backgroundColor;
+                btn.style.backgroundColor = "#FFFFFF";
+                btn.style.color = "#000";
+                
+                setTimeout(() => {
+                    btn.style.backgroundColor = ""; // Volver al CSS (rgba)
+                    btn.style.color = "#FFFFFF";
+                }, 150);
+            }
+        }
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+

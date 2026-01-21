@@ -1,20 +1,15 @@
 // rov-input-keyboard.js
-// Manejo de teclado: WASD + Flechas + Acciones + Dual Heave
 
-console.log("SYSTEM: Keyboard Module Loaded"); // Debug para confirmar carga
+console.log("SYSTEM: Keyboard Module Loaded"); 
 
 const keyState = {};
 
-// Listeners globales
 window.addEventListener('keydown', (e) => {
     keyState[e.code] = true;
     
-    // Debug rápido: Si presionas 'L', debería salir esto en consola
-    if(e.code === 'KeyL') console.log("Key L pressed - Toggle Lights");
-
-    // Acciones Discretas
     if (!e.repeat) {
         switch(e.code) {
+            case 'Enter': ROV.actions.scanWaypoint(); break; // <-- NUEVO
             case 'KeyL': ROV.actions.toggleLights(); break;
             case 'KeyH': ROV.actions.cycleHUD(); break;
             case 'KeyR': ROV.actions.resetPosition(); break;
@@ -29,31 +24,28 @@ window.addEventListener('keyup', (e) => {
     keyState[e.code] = false;
 });
 
-// AHORA: Anclamos la función a ROV para asegurarnos que main.js la encuentre
 ROV.updateKeyboard = function() {
-    // Si el usuario está escribiendo en un input, no movemos el ROV
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
-    // 1. MOVIMIENTO HORIZONTAL (WASD)
-    let surge = 0; // W/S
-    let sway = 0;  // A/D
+    // 1. MOVIMIENTO HORIZONTAL
+    let surge = 0; 
+    let sway = 0;  
 
     if (keyState['KeyW']) surge = 1;
     if (keyState['KeyS']) surge = -1;
     if (keyState['KeyA']) sway = -1;
     if (keyState['KeyD']) sway = 1;
 
-    // 2. MOVIMIENTO VERTICAL (Dual Support)
+    // 2. MOVIMIENTO VERTICAL
     let heave = 0;
     if (keyState['Space'] || keyState['KeyE']) heave = 1;
     if (keyState['ShiftLeft'] || keyState['ShiftRight'] || keyState['KeyQ']) heave = -1;
 
-    // Aplicar física
     if (surge !== 0 || sway !== 0 || heave !== 0) {
         ROV.physics.applyMove(surge, sway, heave, false);
     }
 
-    // 3. ROTACIÓN DE CÁMARA (Flechas)
+    // 3. ROTACIÓN DE CÁMARA
     const { rig, pivot } = ROV.refs;
     if (!rig || !pivot) return;
 

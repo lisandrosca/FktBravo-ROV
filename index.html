@@ -7,6 +7,19 @@
     
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/menu-styles.css">
+    <style>
+        /* Estilo rápido para tarjetas deshabilitadas */
+        .mission-card.disabled {
+            opacity: 0.6;
+            pointer-events: none; /* No clickeable */
+            filter: grayscale(0.8);
+        }
+        .mission-card.disabled .launch-btn {
+            background: #444;
+            border-color: #666;
+            color: #aaa;
+        }
+    </style>
 </head>
 <body>
 
@@ -34,8 +47,8 @@
 
         <a href="habitats/clam_bed.html" class="mission-card">
             <div class="card-img-container">
-                <img src="assets/images/clam_bed.jpg" alt="Ambiente Clan Bed" class="card-img img-env">
-                <img src="assets/images/clam_bed_close.jpg" alt="Detalle Clan Bed" class="card-img img-closeup">
+                <img src="assets/images/clam_bed.jpg" alt="Ambiente Clam Bed" class="card-img img-env">
+                <img src="assets/images/clam_bed_close.jpg" alt="Detalle Clam Bed" class="card-img img-closeup">
             </div>
             <div class="card-body">
                 <div class="dive-id">DIVE S0889</div>
@@ -45,18 +58,18 @@
             </div>
         </a>
 
-        <a href="habitats/giant_corals.html" class="mission-card">
+        <div class="mission-card disabled">
             <div class="card-img-container">
                 <img src="assets/images/giant_corals.jpg" alt="Ambiente Giant Corals" class="card-img img-env">
                 <img src="assets/images/giant_corals_close.jpg" alt="Detalle Giant Corals" class="card-img img-closeup">
             </div>
             <div class="card-body">
-                <div class="dive-id">DIVE S0889</div>
+                <div class="dive-id">DIVE S0892</div>
                 <div class="dive-title">Giant Corals Bed</div>
-                <div class="dive-stats"><span>PROFUNDIDAD: 420 m</span></div>
-                <div class="launch-btn">LAUNCH DIVE</div>
+                <div class="dive-stats"><span>PROFUNDIDAD: 483 m</span></div>
+                <div class="launch-btn">COMING SOON</div>
             </div>
-        </a>
+        </div>
 
     </main>
 
@@ -65,8 +78,7 @@
     </footer>
 
     <script>
-        document.querySelectorAll('.mission-card').forEach(card => {
-            // Optimización para feedback visual en dispositivos táctiles
+        document.querySelectorAll('.mission-card:not(.disabled)').forEach(card => {
             card.addEventListener('touchstart',  function() { this.classList.add('is-touching'); }, {passive: true});
             card.addEventListener('touchend',    function() { this.classList.remove('is-touching'); }, {passive: true});
             card.addEventListener('touchcancel', function() { this.classList.remove('is-touching'); }, {passive: true});

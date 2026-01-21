@@ -19,6 +19,30 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!data[jsonKey]) throw new Error(`Key "${jsonKey}" not found in JSON`);
             
             const diveData = data[jsonKey];
+            
+            // 1. Inyectar Configuración Global (Vital para Física y Resets)
+            if (window.ROV && ROV.config) {
+                // Profundidad base para que la física calcule bien (evita el 0m)
+                ROV.config.baseDepth = diveData.depth || 0;
+                
+                // Coordenadas de Spawn
+                ROV.config.startPosition = diveData.start_position || { x: 0, y: 2, z: 10 };
+                ROV.config.startRotation = diveData.start_rotation || { x: 0, y: 0, z: 0 };
+            }
+
+            // 2. Aplicar Posición Inicial Inmediatamente
+            const rig = document.getElementById('camera-rig');
+            if (rig) {
+                // Usamos los datos recién guardados o los del JSON
+                const startPos = diveData.start_position || { x: 0, y: 2, z: 10 };
+                const startRot = diveData.start_rotation || { x: 0, y: 0, z: 0 };
+                
+                rig.setAttribute('position', startPos);
+                rig.setAttribute('rotation', startRot);
+                console.log(`[Loader] Spawning at:`, startPos);
+            }
+
+            // 3. Actualizar UI y cargar modelo
             updateUI(diveData);
             loadModelDirectly(diveData.model_path);
         })
@@ -87,7 +111,7 @@ function updateUI(data) {
 
     setText('ui-title', data.title);
     setText('ui-id', data.id);
-    setText('ui-depth', data.depth);
+    setText('ui-depth', data.depth); // Esto es visual inicial, luego la física toma el control
     setText('ui-temp', data.temp);
     setText('ui-salinity', data.salinity);
     setText('ui-o2', data.o2_con);

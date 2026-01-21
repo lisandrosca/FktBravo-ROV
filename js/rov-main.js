@@ -4,18 +4,21 @@
 let frameCounter = 0; // Para optimizar actualizaciones de UI
 
 // 1. Evento de carga de modelo (Delegamos al Handler)
-ROV.refs.mapEntity.addEventListener('model-loaded', () => {
-    const mesh = ROV.refs.mapEntity.getObject3D('mesh');
-    if (ROV.modelHandler) {
-        ROV.modelHandler.setupModel(mesh);
-    }
-    
-    // Feedback visual en consola debug
-    if(ROV.refs.debug) {
-        ROV.refs.debug.innerText = "SYSTEM: ROV Online - Dive Active";
-        setTimeout(() => { ROV.refs.debug.style.opacity = "0"; }, 5000);
-    }
-});
+// Usamos un chequeo de seguridad por si ROV.refs no está listo aun
+if (ROV.refs && ROV.refs.mapEntity) {
+    ROV.refs.mapEntity.addEventListener('model-loaded', () => {
+        const mesh = ROV.refs.mapEntity.getObject3D('mesh');
+        if (ROV.modelHandler) {
+            ROV.modelHandler.setupModel(mesh);
+        }
+        
+        // Feedback visual en consola debug
+        if(ROV.refs.debug) {
+            ROV.refs.debug.innerText = "SYSTEM: ROV Online - Dive Active";
+            setTimeout(() => { ROV.refs.debug.style.opacity = "0"; }, 5000);
+        }
+    });
+}
 
 // 2. Inicialización del Sistema
 function initSystem() {
@@ -34,6 +37,11 @@ function initSystem() {
         });
     }
 
+    // --- NUEVO: Inicializar Waypoints ---
+    if (ROV.waypoints) {
+        ROV.waypoints.init();
+    }
+
     // Iniciar el loop
     updateLoop();
 }
@@ -50,10 +58,10 @@ function updateLoop() {
     // 1. Gamepad
     if(typeof updateGamepad === 'function') updateGamepad();
 
-    if(ROV.updateKeyboard) 
-ROV.updateKeyboard(); 
+    // 2. Teclado
+    if(ROV.updateKeyboard) ROV.updateKeyboard(); 
 
-    // 2. Touch Virtual
+    // 3. Touch Virtual
     if (activeAction) {
         let fov = cam.getAttribute('camera').fov;
         let surge = 0, sway = 0, heave = 0;
@@ -72,7 +80,7 @@ ROV.updateKeyboard();
         }
 
         // Zoom (Propiedad de cámara)
-        const zoomSpd = ROV.config.baseZoomSpeed;
+        const zoomSpd = ROV.config ? ROV.config.baseZoomSpeed : 0.5; // Fallback seguro
         if (activeAction === 'zoom-in') fov = Math.max(5, fov - (zoomSpd * (fov/80)));
         if (activeAction === 'zoom-out') fov = Math.min(150, fov + (zoomSpd * (fov/80)));
         
@@ -82,11 +90,16 @@ ROV.updateKeyboard();
         }
     }
 
-    // --- B. LÓGICA DE UI (Prioridad Baja - Throttled) ---
-    // Solo actualizamos textos 1 de cada 10 frames para mejorar rendimiento en móvil
+    // --- B. LÓGICA DE UI Y SISTEMAS LENTOS (Prioridad Baja - Throttled) ---
+    // Solo actualizamos 1 de cada 10 frames para mejorar rendimiento en móvil
     
     frameCounter++;
-    if (frameCounter % 10 !== 0) return; // Saltamos actualización de UI
+    if (frameCounter % 10 !== 0) return; // Saltamos actualización
+
+    // --- NUEVO: Actualizar Waypoints (Chequeo de proximidad) ---
+    if (ROV.waypoints) {
+        ROV.waypoints.update();
+    }
 
     // Lecturas lentas (getAttribute es lento)
     // Nota: En fase 3 optimizaremos para leer de object3D directamente
@@ -102,7 +115,7 @@ ROV.updateKeyboard();
     
     // Profundidad
     if(depthText) {
-        const bDepth = ROV.config.baseDepth || 0;
+        const bDepth = (ROV.config && ROV.config.baseDepth) ? ROV.config.baseDepth : 0;
         depthText.innerText = Math.floor(bDepth - pos.y);
     }
 
