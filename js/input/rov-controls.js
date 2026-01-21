@@ -6,6 +6,21 @@ function updateGamepad() {
     const gp = gamepads[0]; 
     if (!gp) return;
 
+    // BLOQUEO POR MODAL (Prioridad Máxima)
+    if (ROV.state.isLogbookOpen) {
+        // Permitir cerrar con botón B (índice 1) o Start (9)
+        if (gp.buttons[1].pressed || gp.buttons[9].pressed) {
+            // Debounce simple para que no parpadee
+            if (!ROV.state.debounce.menu) {
+                ROV.modal.close();
+                triggerDebounce('menu');
+            }
+        }
+        return; // <--- IMPORTANTE: Detiene todo el movimiento si el modal está abierto
+    }
+
+    // --- LÓGICA NORMAL DE JUEGO ---
+
     const { state, config } = ROV;
 
     // A. MOVIMIENTO
@@ -141,6 +156,9 @@ function initTouchRotation() {
     }, {passive: false});
 
     zone.addEventListener('touchmove', (e) => {
+        // Si el modal está abierto, no rotar cámara
+        if (ROV.state.isLogbookOpen) return;
+
         if (!ROV.state.touchLook.dragging) return;
         if(e.cancelable) e.preventDefault(); 
 

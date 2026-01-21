@@ -8,8 +8,18 @@ window.addEventListener('keydown', (e) => {
     keyState[e.code] = true;
     
     if (!e.repeat) {
+        // 1. PRIORIDAD: Si el modal está abierto, ESC lo cierra.
+        if (ROV.state.isLogbookOpen && e.code === 'Escape') {
+            ROV.modal.close();
+            return; // Cortamos aquí.
+        }
+
+        // 2. BLOQUEO: Si el modal está abierto, IGNORAR resto de teclas
+        if (ROV.state.isLogbookOpen) return; 
+
+        // 3. ACCIONES NORMALES (Solo si el modal está cerrado)
         switch(e.code) {
-            case 'Enter': ROV.actions.scanWaypoint(); break; // <-- NUEVO
+            case 'Enter': ROV.actions.scanWaypoint(); break;
             case 'KeyL': ROV.actions.toggleLights(); break;
             case 'KeyH': ROV.actions.cycleHUD(); break;
             case 'KeyR': ROV.actions.resetPosition(); break;
@@ -25,9 +35,15 @@ window.addEventListener('keyup', (e) => {
 });
 
 ROV.updateKeyboard = function() {
+    // 1. Bloqueo si el usuario escribe en un input
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
-    // 1. MOVIMIENTO HORIZONTAL
+    // 2. BLOQUEO: Si el modal está abierto, detenemos toda física
+    if (ROV.state.isLogbookOpen) {
+        return; 
+    }
+
+    // 3. MOVIMIENTO HORIZONTAL
     let surge = 0; 
     let sway = 0;  
 
@@ -36,7 +52,7 @@ ROV.updateKeyboard = function() {
     if (keyState['KeyA']) sway = -1;
     if (keyState['KeyD']) sway = 1;
 
-    // 2. MOVIMIENTO VERTICAL
+    // 4. MOVIMIENTO VERTICAL
     let heave = 0;
     if (keyState['Space'] || keyState['KeyE']) heave = 1;
     if (keyState['ShiftLeft'] || keyState['ShiftRight'] || keyState['KeyQ']) heave = -1;
@@ -45,7 +61,7 @@ ROV.updateKeyboard = function() {
         ROV.physics.applyMove(surge, sway, heave, false);
     }
 
-    // 3. ROTACIÓN DE CÁMARA
+    // 5. ROTACIÓN DE CÁMARA
     const { rig, pivot } = ROV.refs;
     if (!rig || !pivot) return;
 

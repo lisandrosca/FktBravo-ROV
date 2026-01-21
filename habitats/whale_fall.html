@@ -9,6 +9,18 @@
 </head>
 <body>
 
+    <div id="modal-overlay">
+        <div id="modal-card">
+            <div class="modal-header">
+                <div class="modal-title" id="m-title">SYSTEM LOG</div>
+                <button class="modal-close-btn" onclick="ROV.modal.close()">&times;</button>
+            </div>
+            <div class="modal-body" id="m-body">
+                <p>Scanning data...</p>
+            </div>
+        </div>
+    </div>
+
     <div id="ui-layer">
         
         <div id="telemetry-block" class="hidable">
@@ -138,8 +150,7 @@
     <script src="../js/systems/rov-actions.js"></script>
     <script src="../js/systems/rov-model-handler.js"></script>
     <script src="../js/systems/rov-waypoints.js"></script>
-    
-    <script src="../js/input/rov-input-keyboard.js"></script>
+    <script src="../js/systems/rov-modal.js"></script> <script src="../js/input/rov-input-keyboard.js"></script>
     <script src="../js/input/rov-controls.js"></script>
     
     <script src="../js/loader.js"></script> 

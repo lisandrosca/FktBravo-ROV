@@ -181,5 +181,188 @@ body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Courie
     #debug-console { position: absolute; left: 285px; }
     .btn { width: 55px; height: 55px; }
 }
+/* --- BITÁCORA / MODAL SYSTEM (Fase 1) --- */
+
+/* Fondo oscuro de bloqueo */
+#modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 200; /* Por encima del HUD */
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Tarjeta contenedora */
+#modal-card {
+    width: 90%;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    color: #333;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 25px;
+    
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Fuente limpia, no Courier */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#modal-overlay.active #modal-card {
+    transform: translateY(0);
+}
+
+/* Elementos temporales del esqueleto */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.modal-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.modal-close-btn:hover { color: #000; }
+
+.modal-body {
+    min-height: 100px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+/* --- UI KIT BITÁCORA (Fase 2) --- */
+
+/* 1. Tipografía y Estructura */
+.modal-meta-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.modal-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #eee;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.modal-tag.warning { background: #fff3cd; color: #856404; }
+.modal-tag.info { background: #d1ecf1; color: #0c5460; }
+
+.modal-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 20px;
+    border-left: 3px solid #00ff00; /* Toque Sci-Fi sutil */
+    padding-left: 12px;
+}
+
+/* 2. Video Responsive (16:9) */
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #000;
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+}
+
+.media-caption {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    font-style: italic;
+    text-align: right;
+}
+
+/* 3. Galería de Imágenes (Grid) */
+.modal-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.gallery-item {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    aspect-ratio: 1 / 1; /* Cuadradas */
+    cursor: pointer;
+    background: #eee;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
+/* 4. Gráficos (Fondo blanco/borde) */
+.chart-container {
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.chart-container img {
+    max-width: 100%;
+    height: auto;
+}
+
 
 .ui-hidden { opacity: 0; pointer-events: none; }

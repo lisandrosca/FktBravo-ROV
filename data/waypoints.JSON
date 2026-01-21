@@ -2,25 +2,26 @@
   "whale-fall": [
     {
       "id": "wp-vertebra-sample",
-      "position": { "x": -1.19, "y": -1.84, "z": -9.14 },
+      "position": { "x": -7.76, "y": -1.84, "z": -10.91},
       "title": "Muestreo de Vértebra",
       "icon": "video",
       "content": {
-        "description": "Extracción de vértebra de ballena utilizando el brazo manipulador Schilling Titan 4. Se observa la consistencia ósea y la resuspensión de sedimento.",
-        "youtube_id": "dQw4w9WgXcQ", 
+        "description": "Extracción de vértebra de ballena utilizando el brazo del ROV SuBastian.",
+        "youtube_id": "NqnWDBwp-k8?si=pxZNd__l8gX2lmRS",
         "video_caption": "Clip: Momento de la extracción - R/V Falkor (too)"
       }
     },
     {
-      "id": "wp-daniel-photo",
+      "id": "wp-lab-photo",
       "position": { "x": 2.74, "y": -1.84, "z": -10.50},
-      "title": "Procesamiento en Lab",
+      "title": "Procesamiento en Laboratorio",
       "icon": "image",
       "content": {
-        "description": "Daniel sosteniendo la muestra recuperada tras su limpieza inicial. Se aprecia el tamaño masivo de la vértebra lumbar.",
+        "description": "Daniel y Pepe sosteniendo la muestra recuperada previo a su procesamiento.",
         "gallery": [
-          { "src": "../assets/photos/daniel_vertebra.jpg", "caption": "Daniel en el Wet Lab" },
-          { "src": "../assets/photos/vertebra_clean.jpg", "caption": "Detalle de la estructura ósea" }
+          { "src": "../assets/photos/labo_vertebra.jpg", "caption": "Daniel y Pepe sacando la muestra del SuBastian" },
+          { "src": "../assets/photos/labo_vertebra2.jpg", "caption": "Detalle de la vertebra" },
+          { "src": "../assets/photos/labo_vertebra3.jpg", "caption": "Detalle de la estructura ósea en el laboratorio." }
         ]
       }
     },
@@ -30,7 +31,7 @@
       "title": "Ecología: Isópodos",
       "icon": "eye",
       "content": {
-        "description": "Close-up de isópodos realizando comportamiento de 'trencito' sobre el sustrato coralino.",
+        "description": "Close-up de isópodos realizando el 'trencito' sobre el coral.",
         "gallery": [
           { "src": "../assets/photos/isopods_macro.jpg", "caption": "Macrofotografía in situ" }
         ]
@@ -39,7 +40,7 @@
     
     {
       "id": "wp-edna",
-      "position": { "x": -7.76, "y": -1.84, "z": -10.91},
+      "position": { "x": -1.19, "y": -1.84, "z": -9.14 },
       "title": "Resultados eDNA",
       "icon": "chart",
       "content": {

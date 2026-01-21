@@ -12,7 +12,7 @@ ROV.state = {
         menu: false, 
         speed: false 
     },
-    
+    isLogbookOpen: false,
     // Estado para el rastreo del dedo (Touch Look)
     touchLook: {
         dragging: false,

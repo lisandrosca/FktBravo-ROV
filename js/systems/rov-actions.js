@@ -74,18 +74,26 @@ ROV.actions = {
         ROV.physics.updateSpeedUI();
     },
 
-    // --- NUEVA FUNCIÓN CONTEXTUAL ---
+    // --- ACCIÓN CONTEXTUAL: SCAN ---
     scanWaypoint: function() {
         const wpId = ROV.state.activeWaypoint;
         
         if (wpId) {
-            console.log(`[SYSTEM] Scanning Target: ${wpId}`);
-            
-            // Feedback Visual: Parpadeo del botón
+            // 1. Recuperar DATOS COMPLETOS desde la memoria de Waypoints
+            let fullData = null;
+            if (ROV.waypoints && ROV.waypoints.getDataById) {
+                fullData = ROV.waypoints.getDataById(wpId);
+            }
+
+            // 2. Abrir Modal con datos (o fallback si falla)
+            if (ROV.modal) {
+                ROV.modal.open(fullData || { title: "UNKNOWN DATA", content: {} });
+            }
+
+            // 3. Feedback Visual: Parpadeo del botón
             const btn = document.getElementById('btn-scan');
             if(btn) {
-                // Flash blanco para indicar foto/scan
-                const originalBg = btn.style.backgroundColor;
+                // Flash blanco momentáneo
                 btn.style.backgroundColor = "#FFFFFF";
                 btn.style.color = "#000";
                 
@@ -97,16 +105,3 @@ ROV.actions = {
         }
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
