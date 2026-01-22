@@ -19,7 +19,7 @@
       "content": {
         "description": "Daniel y Pepe sosteniendo la muestra recuperada previo a su procesamiento.",
         "gallery": [
-          { "src": "../assets/photos/labo_vertebra.jpg", "caption": "Daniel y Pepe sacando la muestra del SuBastian" },
+          { "src": "../assets/photos/labo_vertebra.jpg", "caption": "Daniel y Pepe sacando la muestra del SuBastian." },
           { "src": "../assets/photos/labo_vertebra2.jpg", "caption": "Detalle de la vertebra" },
           { "src": "../assets/photos/labo_vertebra3.jpg", "caption": "Detalle de la estructura ósea en el laboratorio." }
         ]
