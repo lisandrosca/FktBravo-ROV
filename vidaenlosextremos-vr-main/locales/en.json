@@ -1,0 +1,81 @@
+{
+    "menu": {
+        "title": "VIDA EN LOS EXTREMOS",
+        "expedition": "Expedition FKt251206 Bravo | R/V Falkor (too)",
+        "dive_id": "DIVE",
+        "depth": "DEPTH",
+        "launch": "LAUNCH DIVE",
+        "coming_soon": "COMING SOON",
+        "footer": "EST. 2026 | Lisandro Scarrone",
+        "gaming_mode": "MISSION MODE",
+        "language": "LANGUAGE"
+    },
+    "habitats": {
+        "whale_fall": "The Whale Fall",
+        "clam_bed": "Vesicomyidae Clam Bed",
+        "giant_corals": "Giant Corals Bed"
+    },
+    "ui": {
+        "loading": "LOADING...",
+        "system_log": "SYSTEM LOG",
+        "scanning_data": "Scanning data...",
+        "toggle_hud": "Toggle HUD",
+        "menu": "Menu",
+        "system_navigation": "System Navigation",
+        "mission_controls": "Mission Controls",
+        "toggle_gyro": "Toggle Gyroscope",
+        "return_to_home": "Return to Home",
+        "explore": "EXPLORE",
+        "reset_position": "Reset Position",
+        "speed": "SPD",
+        "zoom": "ZOM",
+        "vertical": "VRT",
+        "mission_analyzed": "SAMPLES ANALYZED",
+        "mission_complete": "MISSION COMPLETE!"
+    },
+    "controls": {
+        "title": "MISSION CONTROLS",
+        "gamepad": "GAMEPAD",
+        "keyboard": "KEYBOARD",
+        "piloting_nav": "PILOTING & NAVIGATION",
+        "mission_systems": "MISSION & SYSTEMS",
+        "move_strafe": "MOVE FORWARD / STRAFE",
+        "camera_look": "CAMERA LOOK",
+        "ascend_descend": "ASCEND / DESCEND",
+        "zoom_in_out": "ZOOM IN / OUT",
+        "speed_inc_dec": "SPEED +/−",
+        "scan_waypoint": "SCAN WAYPOINT",
+        "open_menu": "OPEN MENU",
+        "close": "CLOSE",
+        "switch_input": "SWITCH INPUT"
+    },
+    "waypoints": {
+        "whale_fall": {
+            "vertebra": {
+                "title": "The Whale Vertebra",
+                "description": "When a whale dies and sinks, its skeleton becomes a nutrient source that sustains deep-sea life for decades. This vertebra was found at 3,895 m depth, in water at 2.4 °C, during a late stage of ecological succession. The bone is slowly mineralizing back into the seafloor, and its hard surface provides an anchor point for corals and other sessile organisms in an otherwise soft-sediment environment.",
+                "caption": "Clip: Moment of extraction - R/V Falkor (too)"
+            },
+            "isopods": {
+                "title": "The Isopod Train",
+                "description": "These tiny crustaceans, each under 2 cm, were spotted lined up along a branch of bathyal coral attached to the whale bone during Dive S0883. They are part of a specialized benthic community adapted to the high-pressure, low-energy conditions of the deep South Atlantic.",
+                "caption": "In-situ macrophotography"
+            },
+            "subastian": {
+                "title": "ROV SuBastian",
+                "description": "SuBastian is the ROV used to explore and sample these sites. The 3D model you are navigating is a digital twin built from photogrammetry — thousands of high-resolution images processed under the lead of pilot Ben Erwin. SuBastian's robotic arms enable precise collection of fragile biological samples with minimal disturbance to the surrounding ecosystem."
+            },
+            "lab": {
+                "title": "From Seafloor to Lab",
+                "description": "Once a sample surfaces, it is moved to the Cold Room immediately to preserve its biological and chemical signatures. A multidisciplinary team handles the recovery and analysis; the Benthic Ecology and Taxonomy teams then work to identify species and study deep-sea biodiversity, keeping everything in cold storage at +2 °C.",
+                "thumb1": "José Isola and Daniel Lauretta handling the vertebra after recovery.",
+                "thumb2": "Detail of the whale vertebra.",
+                "thumb3": "Detail of the bone structure in the laboratory."
+            },
+            "mission": {
+                "title": "Expedition FKt251206",
+                "description": "Led by Chief Scientist María Emilia Bravo, this expedition studied how deep-sea communities help regulate climate by consuming methane from the seafloor before it reaches the atmosphere. The research links the abyssal plain of the SW Atlantic to global climate processes and highlights the importance of mapping these ecosystems."
+            }
+        }
+    }
+}

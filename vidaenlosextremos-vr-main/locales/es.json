@@ -1,0 +1,81 @@
+{
+    "menu": {
+        "title": "VIDA EN LOS EXTREMOS",
+        "expedition": "Expedición FKt251206 Bravo | R/V Falkor (too)",
+        "dive_id": "INMERSIÓN",
+        "depth": "PROFUNDIDAD",
+        "launch": "INICIAR INMERSIÓN",
+        "coming_soon": "PRÓXIMAMENTE",
+        "footer": "EST. 2026 | Lisandro Scarrone",
+        "gaming_mode": "MODO MISIÓN",
+        "language": "IDIOMA"
+    },
+    "habitats": {
+        "whale_fall": "Whale Fall (Caída de Ballena)",
+        "clam_bed": "Bancos de Almejas Vesicomyidae",
+        "giant_corals": "Lecho de Corales Gigantes"
+    },
+    "ui": {
+        "loading": "CARGANDO...",
+        "system_log": "REGISTRO DEL SISTEMA",
+        "scanning_data": "Escaneando datos...",
+        "toggle_hud": "Alternar HUD",
+        "menu": "Menú",
+        "system_navigation": "Navegación del Sistema",
+        "mission_controls": "Controles de Misión",
+        "toggle_gyro": "Alternar Giroscopio",
+        "return_to_home": "Volver al Inicio",
+        "explore": "EXPLORAR",
+        "reset_position": "Restablecer Posición",
+        "speed": "VEL",
+        "zoom": "ZOM",
+        "vertical": "VRT",
+        "mission_analyzed": "MUESTRAS ANALIZADAS",
+        "mission_complete": "¡MISIÓN COMPLETADA!"
+    },
+    "controls": {
+        "title": "CONTROLES DE MISIÓN",
+        "gamepad": "MANDO (GAMEPAD)",
+        "keyboard": "TECLADO",
+        "piloting_nav": "PILOTAJE Y NAVEGACIÓN",
+        "mission_systems": "MISIÓN Y SISTEMAS",
+        "move_strafe": "AVANZAR / DESPLAZAMIENTO LATERAL",
+        "camera_look": "VISTA DE CÁMARA",
+        "ascend_descend": "ASCENDER / DESCENDER",
+        "zoom_in_out": "ACERCAR / ALEJAR ZOOM",
+        "speed_inc_dec": "VELOCIDAD +/−",
+        "scan_waypoint": "ESCANEAR PUNTO DE INTERÉS",
+        "open_menu": "ABRIR MENÚ",
+        "close": "CERRAR",
+        "switch_input": "CAMBIAR ENTRADA"
+    },
+    "waypoints": {
+        "whale_fall": {
+            "vertebra": {
+                "title": "La Vértebra de Ballena",
+                "description": "Cuando una ballena muere y se hunde, su esqueleto se convierte en una fuente de nutrientes que sustenta la vida de las profundidades durante décadas. Esta vértebra fue hallada a 3.895 m de profundidad, en agua a 2,4 °C, durante una etapa tardía de sucesión ecológica. El hueso se está mineralizando lentamente de vuelta al lecho marino, y su superficie dura proporciona un punto de anclaje para corales y otros organismos sésiles en un entorno dominado por sedimentos blandos.",
+                "caption": "Clip: Momento de la extracción - R/V Falkor (too)"
+            },
+            "isopods": {
+                "title": "El Trencito de Isópodos",
+                "description": "Estos pequeños crustáceos, de menos de 2 cm, fueron observados alineados a lo largo de una rama de coral batial unida al hueso de ballena durante la inmersión S0883. Forman parte de una comunidad bentónica especializada, adaptada a las condiciones de alta presión y baja energía del Atlántico Sur profundo.",
+                "caption": "Macrofotografía in situ"
+            },
+            "subastian": {
+                "title": "ROV SuBastian",
+                "description": "SuBastian es el ROV utilizado para explorar y muestrear estos sitios. El modelo 3D que estás navegando es un gemelo digital construido mediante fotogrametría — miles de imágenes de alta resolución procesadas bajo la dirección del piloto Ben Erwin. Los brazos robóticos de SuBastian permiten la recolección precisa de muestras biológicas frágiles con mínima perturbación del ecosistema circundante."
+            },
+            "lab": {
+                "title": "Del Lecho Marino al Laboratorio",
+                "description": "Una vez que una muestra llega a la superficie, se traslada de inmediato a la Sala Fría para preservar sus firmas biológicas y químicas. Un equipo multidisciplinario gestiona la recuperación y el análisis; los equipos de Ecología y Taxonomía Bentónica luego trabajan para identificar especies y estudiar la biodiversidad de las profundidades, manteniendo todo en almacenamiento en frío a +2 °C.",
+                "thumb1": "José Isola y Daniel Lauretta manipulando la vértebra tras la recuperación.",
+                "thumb2": "Detalle de la vértebra de ballena.",
+                "thumb3": "Detalle de la estructura ósea en el laboratorio."
+            },
+            "mission": {
+                "title": "Expedición FKt251206",
+                "description": "Liderada por la científica jefa María Emilia Bravo, esta expedición estudió cómo las comunidades de las profundidades ayudan a regular el clima al consumir metano del fondo marino antes de que llegue a la atmósfera. La investigación vincula la llanura abisal del Atlántico sudoccidental con los procesos climáticos globales y destaca la importancia de mapear estos ecosistemas."
+            }
+        }
+    }
+}

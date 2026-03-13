@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ROV Mission Control</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/rov-core.css">
+    <link rel="stylesheet" href="css/rov-hud.css">
+    <link rel="stylesheet" href="css/rov-inputs.css">
+    <link rel="stylesheet" href="css/rov-ui-overlays.css">
+</head>
+
+<body>
+
+    <div id="modal-overlay">
+        <div id="modal-card">
+            <div class="modal-header">
+                <div class="modal-title" id="m-title" data-i18n="ui.system_log">SYSTEM LOG</div>
+                <button class="modal-close-btn" onclick="ROV.modal.close()">
+                    <svg>
+                        <use href="#icon-close"></use>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="m-body">
+                <p data-i18n="ui.scanning_data">Scanning data...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="ui-layer">
+
+        <div id="telemetry-block" class="hidable telemetry-grid">
+            <div class="telemetry-row"><span class="telemetry-label">SITE</span><span class="telemetry-value"
+                    id="ui-title">LOADING...</span></div>
+            <div class="telemetry-row"><span class="telemetry-label">ID</span><span class="telemetry-value"
+                    id="ui-id">...</span></div>
+            <div class="telemetry-row"><span class="telemetry-label">HEADING</span><span class="telemetry-value"><span
+                        id="head-val">000</span> °</span></div>
+            <div class="telemetry-row"><span class="telemetry-label">DEPTH</span><span class="telemetry-value"><span
+                        id="depth-val">0</span> M</span></div>
+            <div class="telemetry-row"><span class="telemetry-label">TEMP.</span><span class="telemetry-value"><span
+                        id="ui-temp">0.00</span> °C</span></div>
+            <div class="telemetry-row"><span class="telemetry-label">SALINITY</span><span class="telemetry-value"><span
+                        id="ui-salinity">00.00</span> PSU</span></div>
+            <div class="telemetry-row"><span class="telemetry-label">O2 CON</span><span class="telemetry-value"><span
+                        id="ui-o2">000</span> µM</span></div>
+        </div>
+
+        <div id="date-block" class="hidable">--/--/--</div>
+        <div id="coords-block" class="hidable">X: 0.00 Y: 0.00 Z: 0.00</div>
+
+        <div class="top-left-ctrls">
+            <div id="hud-toggle" class="icon-btn" title="Toggle HUD" data-i18n="ui.toggle_hud" data-i18n-attr="title">
+                <svg>
+                    <use href="#icon-eye"></use>
+                </svg>
+            </div>
+        </div>
+
+        <div class="top-right-ctrls">
+            <div id="menu-toggle" class="icon-btn hidable" title="Menu" data-i18n="ui.menu" data-i18n-attr="title"
+                onclick="ROV.controlsUI.toggleMenu()"><svg>
+                    <use href="#icon-menu"></use>
+                </svg></div>
+        </div>
+
+        <div id="debug-console" class="hidable">SYSTEM: Initializing...</div>
+
+        <div id="controls-container" class="hidable">
+
+            <div class="control-grid d-pad">
+                <div class="btn up" id="move-up"><svg>
+                        <use href="#icon-arrow-up"></use>
+                    </svg></div>
+                <div class="btn left" id="move-left"><svg>
+                        <use href="#icon-arrow-left"></use>
+                    </svg></div>
+                <div class="btn down" id="move-down"><svg>
+                        <use href="#icon-arrow-down"></use>
+                    </svg></div>
+                <div class="btn right" id="move-right"><svg>
+                        <use href="#icon-arrow-right"></use>
+                    </svg></div>
+            </div>
+
+            <div class="control-grid right-side-grid">
+
+                <div class="grid-header-explore ui-hidden" id="explore-label">
+                    <div data-i18n="ui.explore" style="display: flex; justify-content: center; align-items: center;">
+                        EXPLORE</div>
+                </div>
+
+                <div class="btn ui-hidden" id="btn-scan">
+                    <svg>
+                        <use href="#icon-scan"></use>
+                    </svg>
+                </div>
+
+                <div class="flex-col">
+                    <span class="label">&nbsp;</span>
+                    <div class="btn" id="reset-pos" title="Reset Position" data-i18n="ui.reset_position"
+                        data-i18n-attr="title"><svg>
+                            <use href="#icon-refresh"></use>
+                        </svg></div>
+                </div>
+
+                <div class="flex-col">
+                    <span class="label"><span data-i18n="ui.speed">VEL</span> <span id="speed-val"
+                            style="color:#00ff00; font-size:0.8em;">1.0</span></span>
+                    <div class="btn" id="speed-plus"><svg>
+                            <use href="#icon-plus"></use>
+                        </svg></div>
+                    <div class="btn" id="speed-minus"><svg>
+                            <use href="#icon-minus"></use>
+                        </svg></div>
+                </div>
+
+                <div class="flex-col">
+                    <span class="label" data-i18n="ui.zoom">ZOM</span>
+                    <div class="btn" id="zoom-in"><svg>
+                            <use href="#icon-zoom-in"></use>
+                        </svg></div>
+                    <div class="btn" id="zoom-out"><svg>
+                            <use href="#icon-zoom-out"></use>
+                        </svg></div>
+                </div>
+
+                <div class="flex-col">
+                    <span class="label" data-i18n="ui.vertical">VRT</span>
+                    <div class="btn" id="ascend"><svg>
+                            <use href="#icon-chevrons-up"></use>
+                        </svg></div>
+                    <div class="btn" id="descend"><svg>
+                            <use href="#icon-chevrons-down"></use>
+                        </svg></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <a-scene renderer="antialias: true; alpha: true; colorManagement: true;" vr-mode-ui="enabled: false"
+        fog="type: exponential; color: #001529; density: 0.05">
+
+        <a-assets>
+            <!-- Assets will be assigned dynamically by rov-model-handler.js -->
+        </a-assets>
+
+        <a-sky color="#001529"></a-sky>
+        <a-grid opacity="0.1" cellColor="#fff"></a-grid>
+
+        <a-entity id="map-entity" position="0 0 0"></a-entity>
+
+        <!-- Zero-Seam Continuity System -->
+        <a-entity id="floor-system">
+            <a-circle id="extended-floor" radius="100" rotation="-90 0 0"
+                material="color: #4e5846; roughness: 1; metalness: 0; opacity: 0" visible="false"></a-circle>
+
+
+        </a-entity>
+
+        <a-entity id="camera-rig" position="0 1.6 5">
+            <a-entity id="cam-pivot" rotation="0 0 0">
+                <a-entity id="main-camera" camera="fov: 50"
+                    look-controls="magicWindowTrackingEnabled: false; touchEnabled: true;">
+
+                    <a-light id="rov-omni" type="point" intensity="2.5" distance="40" position="0 0 0"></a-light>
+                    <a-light id="rov-point" type="point" intensity="0.8" distance="15" position="0 0 -1"></a-light>
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+        <a-light type="hemisphere" intensity="0.4" groundColor="#000"></a-light>
+    </a-scene>
+    <!-- SYSTEM MENU -->
+    <div id="system-menu">
+        <div class="menu-close-btn" onclick="ROV.controlsUI.toggleMenu(false)"><svg>
+                <use href="#icon-close"></use>
+            </svg></div>
+
+        <!-- GAMIFICATION TOGGLE -->
+        <div class="menu-item-row">
+            <span class="menu-label-text" data-i18n="menu.gaming_mode">MISSION MODE</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="gamified-mode-check"
+                    onchange="ROV.waypoints.toggleGamifiedMode(this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="menu-title" data-i18n="menu.language">LANGUAGE</div>
+        <div class="lang-selector sidebar-selector">
+            <button class="lang-btn" onclick="ROV.localization.setLanguage('es')" data-lang="es">ES</button>
+            <button class="lang-btn" onclick="ROV.localization.setLanguage('en')" data-lang="en">EN</button>
+        </div>
+        <div class="menu-title" data-i18n="ui.system_navigation">System Navigation</div>
+        <div class="menu-items">
+            <div class="menu-item" id="menu-controls"><svg>
+                    <use href="#icon-help"></use>
+                </svg><span data-i18n="ui.mission_controls">Mission Controls</span></div>
+            <div class="menu-item" id="menu-gyro"><svg>
+                    <use href="#icon-gyro"></use>
+                </svg><span data-i18n="ui.toggle_gyro">Toggle Gyroscope</span></div>
+            <div class="menu-item danger" id="menu-home"><svg>
+                    <use href="#icon-exit"></use>
+                </svg><span data-i18n="ui.return_to_home">Return to Home</span></div>
+        </div>
+    </div>
+
+    <!-- CONTROLS OVERLAY -->
+    <div id="controls-overlay">
+        <div class="controls-header">
+            <div class="controls-title" data-i18n="controls.title">MISSION CONTROLS</div>
+            <div class="controls-tabs">
+                <button class="tab-btn active" data-tab="gamepad" data-i18n="controls.gamepad">GAMEPAD</button>
+                <button class="tab-btn" data-tab="keyboard" data-i18n="controls.keyboard">KEYBOARD</button>
+            </div>
+        </div>
+
+        <div class="controls-content">
+            <div class="controls-view active" id="view-gamepad">
+                <div class="mapping-grid">
+                    <div class="mapping-section">
+                        <h3 data-i18n="controls.piloting_nav">PILOTING & NAVIGATION</h3>
+                        <div class="mapping-item"><span class="mapping-key">L STICK</span><span class="mapping-label"
+                                data-i18n="controls.move_strafe">MOVE FORWARD / STRAFE</span></div>
+                        <div class="mapping-item"><span class="mapping-key">R STICK</span><span class="mapping-label"
+                                data-i18n="controls.camera_look">CAMERA LOOK</span></div>
+                        <div class="mapping-item">
+                            <div class="mapping-key-pair"><span class="mapping-key-half">L1</span><span
+                                    class="mapping-key-half">R1</span></div><span class="mapping-label"
+                                data-i18n="controls.ascend_descend">ASCEND /
+                                DESCEND</span>
+                        </div>
+                        <div class="mapping-item">
+                            <div class="mapping-key-pair"><span class="mapping-key-half">L2</span><span
+                                    class="mapping-key-half">R2</span></div><span class="mapping-label"
+                                data-i18n="controls.zoom_in_out">ZOOM IN /
+                                OUT</span>
+                        </div>
+                        <div class="mapping-item">
+                            <div class="mapping-key-pair"><span class="mapping-key-half">D ↑</span><span
+                                    class="mapping-key-half">D ↓</span></div><span class="mapping-label"
+                                data-i18n="controls.speed_inc_dec">SPEED
+                                +/−</span>
+                        </div>
+                    </div>
+                    <div class="mapping-section">
+                        <h3 data-i18n="controls.mission_systems">MISSION & SYSTEMS</h3>
+                        <div class="mapping-item"><span class="mapping-key"><svg class="gp-hint-svg">
+                                    <use href="#gp-cross"></use>
+                                </svg></span><span class="mapping-label" data-i18n="controls.scan_waypoint">SCAN
+                                WAYPOINT</span></div>
+                        <div class="mapping-item"><span class="mapping-key"><svg class="gp-hint-svg">
+                                    <use href="#gp-square"></use>
+                                </svg></span><span class="mapping-label" data-i18n="ui.toggle_hud">TOGGLE HUD</span>
+                        </div>
+                        <div class="mapping-item"><span class="mapping-key">SELECT</span><span class="mapping-label"
+                                data-i18n="ui.reset_position">RESET POSITION</span></div>
+                        <div class="mapping-item"><span class="mapping-key">START</span><span class="mapping-label"
+                                data-i18n="controls.open_menu">OPEN
+                                MENU</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-view" id="view-keyboard">
+                <div class="mapping-grid">
+                    <div class="mapping-section">
+                        <h3 data-i18n="controls.piloting_nav">PILOTING & NAVIGATION</h3>
+                        <div class="mapping-item"><span class="mapping-key">W A S D</span><span class="mapping-label"
+                                data-i18n="controls.move_strafe">MOVE FORWARD / STRAFE</span></div>
+                        <div class="mapping-item"><span class="mapping-key">ARROWS</span><span class="mapping-label"
+                                data-i18n="controls.camera_look">CAMERA LOOK</span></div>
+                        <div class="mapping-item">
+                            <div class="mapping-key-pair"><span class="mapping-key-half">SPACE</span><span
+                                    class="mapping-key-half">SHIFT</span></div><span class="mapping-label"
+                                data-i18n="controls.ascend_descend">ASCEND /
+                                DESCEND</span>
+                        </div>
+                        <div class="mapping-item">
+                            <div class="mapping-key-pair"><span class="mapping-key-half">E</span><span
+                                    class="mapping-key-half">Q</span></div><span class="mapping-label"
+                                data-i18n="controls.zoom_in_out">ZOOM IN /
+                                OUT</span>
+                        </div>
+                        <div class="mapping-item">
+                            <div class="mapping-key-pair"><span class="mapping-key-half">1</span><span
+                                    class="mapping-key-half">2</span></div><span class="mapping-label"
+                                data-i18n="controls.speed_inc_dec">SPEED +/−</span>
+                        </div>
+                    </div>
+                    <div class="mapping-section">
+                        <h3 data-i18n="controls.mission_systems">MISSION & SYSTEMS</h3>
+                        <div class="mapping-item"><span class="mapping-key">ENTER</span><span class="mapping-label"
+                                data-i18n="controls.scan_waypoint">SCAN
+                                WAYPOINT</span></div>
+                        <div class="mapping-item"><span class="mapping-key">H</span><span class="mapping-label"
+                                data-i18n="ui.toggle_hud">TOGGLE
+                                HUD</span></div>
+                        <div class="mapping-item"><span class="mapping-key">R</span><span class="mapping-label"
+                                data-i18n="ui.reset_position">RESET
+                                POSITION</span></div>
+                        <div class="mapping-item">
+                            <div class="mapping-key-pair"><span class="mapping-key-half">M</span><span
+                                    class="mapping-key-half">ESC</span></div><span class="mapping-label"
+                                data-i18n="controls.open_menu">OPEN
+                                MENU</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-footer">
+            <div class="footer-hints">
+                <div class="footer-hint"><span class="hint-key" id="kb-hints">ESC</span> <span class="hint-key"
+                        id="gp-hints" style="display:none"><svg class="gp-hint-svg">
+                            <use href="#gp-circle"></use>
+                        </svg></span> <span data-i18n="controls.close">CLOSE</span></div>
+                <div class="footer-hint"><span class="hint-key" id="switch-key">TAB</span> <span
+                        data-i18n="controls.switch_input">SWITCH INPUT</span></div>
+            </div>
+            <div id="version-display">VER. DEPLOYED</div>
+        </div>
+    </div>
+
+    <!-- SVG Icons are now loaded dynamically from assets/icons.html -->
+
+    <script src="js/systems/localization.js"></script>
+    <script src="js/core/rov-init.js"></script>
+    <script src="js/core/rov-settings.js"></script>
+    <script src="js/core/rov-state.js"></script>
+    <script src="js/core/rov-dom.js"></script>
+
+    <script src="js/systems/rov-physics.js"></script>
+    <script src="js/systems/rov-actions.js"></script>
+    <script src="js/systems/rov-visual-blender.js"></script>
+    <script src="js/systems/rov-model-handler.js"></script>
+    <script src="js/systems/rov-waypoints.js"></script>
+    <script src="js/systems/rov-modal.js"></script>
+    <script src="js/input/rov-input-keyboard.js"></script>
+    <script src="js/input/rov-controls.js"></script>
+
+    <script src="js/systems/rov-controls-ui.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/rov-main.js"></script>
+
+</body>
+
+</html>

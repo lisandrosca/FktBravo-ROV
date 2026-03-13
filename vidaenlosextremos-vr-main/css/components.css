@@ -1,0 +1,214 @@
+/* ==========================================================================
+   SHARED UI COMPONENTS
+   ========================================================================== */
+
+/* Buttons & Interactive Elements */
+.btn,
+.icon-btn,
+.tab-btn,
+.menu-item,
+.launch-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    pointer-events: auto;
+    text-transform: uppercase;
+}
+
+.btn,
+.icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+    backdrop-filter: blur(2px);
+}
+
+.icon-btn {
+    width: 45px;
+    height: 45px;
+}
+
+.btn {
+    width: clamp(40px, 13vw, 55px);
+    height: clamp(40px, 13vw, 55px);
+}
+
+.btn:active,
+.icon-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0.95);
+}
+
+/* Icons within buttons */
+.btn svg,
+.icon-btn svg,
+.menu-item svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Labels */
+.label {
+    font-size: 10px;
+    opacity: 0.9;
+    margin-bottom: 3px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    font-family: var(--font-mono);
+    /* Keep technical labels mono */
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-white);
+    backdrop-filter: blur(var(--blur-strength));
+    -webkit-backdrop-filter: blur(var(--blur-strength));
+}
+
+.dark-overlay {
+    background: var(--glass-bg-dark);
+    backdrop-filter: blur(var(--overlay-blur));
+}
+
+/* MODULAR LAYOUT COMPONENTS */
+
+/* D-Pad Pattern */
+.d-pad {
+    display: grid;
+    grid-template-areas:
+        ". up ."
+        "left down right";
+    gap: 10px;
+}
+
+.d-pad .up {
+    grid-area: up;
+}
+
+.d-pad .down {
+    grid-area: down;
+}
+
+.d-pad .left {
+    grid-area: left;
+}
+
+.d-pad .right {
+    grid-area: right;
+}
+
+/* Telemetry Grid Pattern */
+.telemetry-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-family: var(--font-mono);
+}
+
+.telemetry-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.telemetry-label {
+    width: 100px;
+    opacity: 0.7;
+}
+
+.telemetry-value {
+    font-weight: bold;
+}
+
+/* Language Toggle */
+.lang-selector {
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.lang-btn {
+    background: transparent;
+    border: 1px solid var(--border-white);
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.5;
+}
+
+.lang-btn:hover {
+    opacity: 1;
+    border-color: #fff;
+}
+
+.lang-btn.active {
+    opacity: 1;
+    background: #fff;
+    color: #000;
+    font-weight: bold;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    /* Increased slightly for hit area */
+    height: 20px;
+    flex-shrink: 0;
+    /* CRITICAL: Prevent squashing */
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: .4s;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+input:checked+.slider {
+    background-color: #00ff88;
+    /* Mission Green for active state */
+    border-color: #00ff88;
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}

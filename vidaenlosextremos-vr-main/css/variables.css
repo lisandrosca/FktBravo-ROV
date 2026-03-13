@@ -1,0 +1,30 @@
+/* ==========================================================================
+   DESIGN TOKENS & VARIABLES
+   ========================================================================== */
+
+:root {
+    /* Brand Colors */
+    --soi-blue: #00a3e0;
+    --primary-glow: #00ff00;
+
+    /* Backgrounds & Glassmorphism */
+    --bg-dark: #050508;
+    --glass-bg: rgba(0, 15, 30, 0.8);
+    --glass-bg-dark: rgba(5, 5, 8, 0.98);
+    --border-white: rgba(255, 255, 255, 0.2);
+    --border-subtle: rgba(255, 255, 255, 0.1);
+
+    /* Text & UI */
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    --text-main: #ffffff;
+    --ui-white: #ffffff;
+    --ui-shadow: rgba(0, 0, 0, 0.8);
+    --danger: #ff5555;
+
+    /* Transitions & Misc */
+    --transition-speed: 0.3s;
+    --blur-strength: 10px;
+    --overlay-blur: 25px;
+    --color-accent: #00aaff;
+}
